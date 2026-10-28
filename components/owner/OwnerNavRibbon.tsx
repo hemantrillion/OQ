@@ -3,20 +3,8 @@
 import React from 'react';
 import { Language } from '@/lib/booking-types';
 import { t } from '@/lib/translations';
-import {
-  LayoutDashboard,
-  Banknote,
-  CalendarCheck,
-  Database,
-  User,
-} from 'lucide-react';
 
-export type OwnerTab =
-  | 'OVERVIEW'
-  | 'EARNINGS'
-  | 'APPOINTMENTS'
-  | 'BLUEPRINT'
-  | 'PROFILE';
+export type OwnerTab = 'SCHEDULE' | 'APPOINTMENTS' | 'EARNINGS' | 'PROFILE';
 
 interface Props {
   language: Language;
@@ -24,7 +12,6 @@ interface Props {
   onSelectTab: (tab: OwnerTab) => void;
   badgeCounts: {
     upcomingAppointments: number;
-    totalSlots: number;
   };
 }
 
@@ -34,37 +21,19 @@ export const OwnerNavRibbon: React.FC<Props> = ({
   onSelectTab,
   badgeCounts,
 }) => {
-  const tabs = [
+  const tabs: Array<{ id: OwnerTab; label: string; badge?: number }> = [
+    { id: 'SCHEDULE', label: t(language, 'navSchedule') },
     {
-      id: 'OVERVIEW' as OwnerTab,
-      label: t(language, 'navHome'),
-      icon: <LayoutDashboard className="w-4 h-4" />,
-    },
-    {
-      id: 'EARNINGS' as OwnerTab,
-      label: t(language, 'navEarnings'),
-      icon: <Banknote className="w-4 h-4" />,
-    },
-    {
-      id: 'APPOINTMENTS' as OwnerTab,
+      id: 'APPOINTMENTS',
       label: t(language, 'navAppointments'),
-      icon: <CalendarCheck className="w-4 h-4" />,
       badge: badgeCounts.upcomingAppointments,
     },
-    {
-      id: 'BLUEPRINT' as OwnerTab,
-      label: t(language, 'navBlueprint'),
-      icon: <Database className="w-4 h-4" />,
-    },
-    {
-      id: 'PROFILE' as OwnerTab,
-      label: t(language, 'navProfile'),
-      icon: <User className="w-4 h-4" />,
-    },
+    { id: 'EARNINGS', label: t(language, 'navEarnings') },
+    { id: 'PROFILE', label: t(language, 'navProfile') },
   ];
 
   return (
-    <nav className="bg-white border-b border-slate-200 px-4 md:px-6 flex items-center gap-1 overflow-x-auto shrink-0 scrollbar-none">
+    <nav className="px-6 lg:px-12 flex items-center gap-8 border-b border-white/5 bg-black/10 overflow-x-auto scrollbar-none">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
@@ -72,16 +41,15 @@ export const OwnerNavRibbon: React.FC<Props> = ({
           <button
             key={tab.id}
             onClick={() => onSelectTab(tab.id)}
-            className={`py-3 px-3.5 border-b-2 text-xs font-semibold whitespace-nowrap flex items-center gap-2 transition-all ${
+            className={`py-4 border-b-2 text-sm font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 ${
               isActive
-                ? 'border-blue-600 text-blue-600 bg-blue-50/30'
-                : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                ? 'border-sky-400 text-sky-400'
+                : 'border-transparent text-slate-400 hover:text-white'
             }`}
           >
-            {tab.icon}
             <span>{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
                 {tab.badge}
               </span>
             )}

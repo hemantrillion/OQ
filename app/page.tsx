@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Language,
   UserRole,
@@ -15,163 +15,68 @@ import {
   INITIAL_APPOINTMENTS,
 } from '@/lib/booking-data';
 
-// Onboarding Views
-import { LanguageSelectView } from '@/components/onboarding/LanguageSelectView';
-import { RoleSelectView } from '@/components/onboarding/RoleSelectView';
-import { VerificationView } from '@/components/onboarding/VerificationView';
-import { BusinessProfileView } from '@/components/onboarding/BusinessProfileView';
-
-// Customer Portal View
-import { CustomerMapView } from '@/components/customer/CustomerMapView';
-
-// Owner Portal Views
+// Views
 import { OwnerTopNav } from '@/components/owner/OwnerTopNav';
 import { OwnerNavRibbon, OwnerTab } from '@/components/owner/OwnerNavRibbon';
 import { OwnerHomeView } from '@/components/owner/OwnerHomeView';
-import { OwnerEarningsView } from '@/components/owner/OwnerEarningsView';
 import { OwnerAppointmentsView } from '@/components/owner/OwnerAppointmentsView';
-import { OwnerBlueprintView } from '@/components/owner/OwnerBlueprintView';
+import { OwnerEarningsView } from '@/components/owner/OwnerEarningsView';
 import { OwnerProfileView } from '@/components/owner/OwnerProfileView';
-
-// Full-Page AI Chat View
+import { CustomerMapView } from '@/components/customer/CustomerMapView';
 import { FullPageAiChatView } from '@/components/ai/FullPageAiChatView';
 
-type OnboardingStep = 'LANGUAGE' | 'ROLE' | 'VERIFY' | 'PROFILE' | 'COMPLETED';
-
 export default function Home() {
-  // Onboarding & Global State
-  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('LANGUAGE');
   const [language, setLanguage] = useState<Language>('en');
   const [currentRole, setCurrentRole] = useState<UserRole>('OWNER');
-  const [ownerTab, setOwnerTab] = useState<OwnerTab>('OVERVIEW');
+  const [ownerTab, setOwnerTab] = useState<OwnerTab>('SCHEDULE');
   const [aiChatOpen, setAiChatOpen] = useState(false);
 
-  // Core Business Data
-  const [business, setBusiness] = useState<BusinessProfile>(INITIAL_BUSINESS);
+  // Business and Operating State
+  const [business] = useState<BusinessProfile>(INITIAL_BUSINESS);
   const [slots, setSlots] = useState<Slot[]>(INITIAL_SLOTS);
   const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
   const [isOnline, setIsOnline] = useState<boolean>(true);
 
-  // Toggle Language between English and Hindi
+  // Language toggle (अ / A)
   const handleToggleLanguage = () => {
     setLanguage((prev) => (prev === 'en' ? 'hi' : 'en'));
   };
 
-  // Online / Offline Toggle with Smart Business Lock
+  // Online / Offline toggle with smart booking lock
   const handleToggleOnline = (nextState: boolean): boolean => {
     const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
     if (!nextState && isOnline && upcomingCount > 0) {
-      // Cannot go offline if active bookings exist!
       return false;
     }
     setIsOnline(nextState);
     return true;
   };
 
-  // Onboarding Handlers
-  const handleLanguageProceed = () => {
-    setOnboardingStep('ROLE');
-  };
-
-  const handleRoleProceed = () => {
-    setOnboardingStep('VERIFY');
-  };
-
-  const handleVerificationProceed = (contact: { phone?: string; email?: string }) => {
-    if (contact.email) {
-      setBusiness((prev) => ({ ...prev, email: contact.email! }));
-    }
-    if (contact.phone) {
-      setBusiness((prev) => ({ ...prev, phone: contact.phone! }));
-    }
-
-    if (currentRole === 'CUSTOMER') {
-      setOnboardingStep('COMPLETED');
-    } else {
-      setOnboardingStep('PROFILE');
-    }
-  };
-
-  const handleProfileProceed = (newProfile: Partial<BusinessProfile>) => {
-    setBusiness((prev) => ({
-      ...prev,
-      ...newProfile,
-    }));
-    setOnboardingStep('COMPLETED');
-  };
-
-  // Slot Management
+  // Add new operating slot
   const handleAddSlot = (newSlotData: Partial<Slot>) => {
     const newSlot: Slot = {
       id: `slt_${Date.now()}`,
       locationId: newSlotData.locationId || business.locations[0].id,
       locationName: newSlotData.locationName || business.locations[0].name,
-      date: newSlotData.date || '2026-10-29',
-      startTime: newSlotData.startTime || '02:00 PM',
-      endTime: newSlotData.endTime || '02:45 PM',
+      date: newSlotData.date || '2026-10-30',
+      startTime: newSlotData.startTime || '11:00 AM',
+      endTime: newSlotData.endTime || '11:45 AM',
       capacity: newSlotData.capacity || 1,
       bookedCount: 0,
       status: 'OPEN',
       assignedStaff: newSlotData.assignedStaff || business.ownerName,
     };
-    setSlots((prev) => [...prev, newSlot]);
+    setSlots((prev) => [newSlot, ...prev]);
   };
 
-  // Appointment Status Management
+  // Update appointment status
   const handleUpdateAppointmentStatus = (id: string, newStatus: AppointmentStatus) => {
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
     );
   };
 
-  // 1. ONBOARDING: Step 1 - Choose Language
-  if (onboardingStep === 'LANGUAGE') {
-    return (
-      <LanguageSelectView
-        currentLanguage={language}
-        onSelectLanguage={setLanguage}
-        onProceed={handleLanguageProceed}
-      />
-    );
-  }
-
-  // 1. ONBOARDING: Step 2 - Select Role
-  if (onboardingStep === 'ROLE') {
-    return (
-      <RoleSelectView
-        language={language}
-        selectedRole={currentRole}
-        onSelectRole={setCurrentRole}
-        onProceed={handleRoleProceed}
-        onBack={() => setOnboardingStep('LANGUAGE')}
-      />
-    );
-  }
-
-  // 1. ONBOARDING: Step 3 - Identity Verification (OTP)
-  if (onboardingStep === 'VERIFY') {
-    return (
-      <VerificationView
-        language={language}
-        userRole={currentRole}
-        onVerified={handleVerificationProceed}
-        onBack={() => setOnboardingStep('ROLE')}
-      />
-    );
-  }
-
-  // 1. ONBOARDING: Step 4 - Business Profile (Owner Only)
-  if (onboardingStep === 'PROFILE') {
-    return (
-      <BusinessProfileView
-        language={language}
-        onProfileCompleted={handleProfileProceed}
-        onBack={() => setOnboardingStep('VERIFY')}
-      />
-    );
-  }
-
-  // 2. ACTIVE WORKSPACE: FULL-PAGE AI CHAT (When Orb is clicked)
+  // Full-Page AI View (Living Water Orb Interaction)
   if (aiChatOpen) {
     return (
       <FullPageAiChatView
@@ -182,7 +87,7 @@ export default function Home() {
     );
   }
 
-  // 3. ACTIVE WORKSPACE: CUSTOMER MAP VIEW
+  // Client Discovery Map View
   if (currentRole === 'CUSTOMER') {
     return (
       <CustomerMapView
@@ -193,13 +98,11 @@ export default function Home() {
     );
   }
 
-  // 4. ACTIVE WORKSPACE: OWNER PORTAL
-  const upcomingAppointmentsCount = appointments.filter(
-    (a) => a.status === 'UPCOMING'
-  ).length;
+  // Operator Workspace: Deslot
+  const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+    <div className="min-h-screen flex flex-col select-none">
       {/* Top Header */}
       <OwnerTopNav
         language={language}
@@ -211,20 +114,19 @@ export default function Home() {
         onSwitchToCustomer={() => setCurrentRole('CUSTOMER')}
       />
 
-      {/* Navigation Ribbon Tabs */}
+      {/* Navigation Ribbon */}
       <OwnerNavRibbon
         language={language}
         activeTab={ownerTab}
         onSelectTab={setOwnerTab}
         badgeCounts={{
-          upcomingAppointments: upcomingAppointmentsCount,
-          totalSlots: slots.length,
+          upcomingAppointments: upcomingCount,
         }}
       />
 
-      {/* Main View Container */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {ownerTab === 'OVERVIEW' && (
+      {/* Main Single Continuous Surface */}
+      <main className="flex-1 flex flex-col">
+        {ownerTab === 'SCHEDULE' && (
           <OwnerHomeView
             language={language}
             business={business}
@@ -235,10 +137,6 @@ export default function Home() {
           />
         )}
 
-        {ownerTab === 'EARNINGS' && (
-          <OwnerEarningsView language={language} />
-        )}
-
         {ownerTab === 'APPOINTMENTS' && (
           <OwnerAppointmentsView
             language={language}
@@ -247,8 +145,8 @@ export default function Home() {
           />
         )}
 
-        {ownerTab === 'BLUEPRINT' && (
-          <OwnerBlueprintView language={language} />
+        {ownerTab === 'EARNINGS' && (
+          <OwnerEarningsView language={language} />
         )}
 
         {ownerTab === 'PROFILE' && (

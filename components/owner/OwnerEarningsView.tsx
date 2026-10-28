@@ -4,17 +4,6 @@ import React, { useState } from 'react';
 import { Language, EarningTransaction } from '@/lib/booking-types';
 import { INITIAL_TRANSACTIONS } from '@/lib/booking-data';
 import { t } from '@/lib/translations';
-import {
-  DollarSign,
-  CreditCard,
-  Banknote,
-  Calendar,
-  ArrowUpRight,
-  Filter,
-  CheckCircle2,
-  Clock,
-  ArrowDownLeft,
-} from 'lucide-react';
 
 interface Props {
   language: Language;
@@ -22,9 +11,9 @@ interface Props {
 
 export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
   const [filterMethod, setFilterMethod] = useState<'ALL' | 'CASH' | 'ONLINE_UPI'>('ALL');
-  const [transactions, setTransactions] = useState<EarningTransaction[]>(INITIAL_TRANSACTIONS);
+  const [transactions] = useState<EarningTransaction[]>(INITIAL_TRANSACTIONS);
 
-  const filteredTx = transactions.filter(
+  const filtered = transactions.filter(
     (tx) => filterMethod === 'ALL' || tx.method === filterMethod
   );
 
@@ -37,191 +26,153 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
     .reduce((sum, tx) => sum + tx.amount, 0);
 
   return (
-    <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-8 gap-6 max-w-7xl mx-auto w-full overflow-y-auto">
-      {/* Top Banner */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="flex-1 flex flex-col p-6 lg:p-12 gap-10 max-w-7xl mx-auto w-full">
+      {/* 1. Header Banner */}
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-3xl font-extrabold text-white tracking-tight">
             {t(language, 'earningsTitle')}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {t(language, 'earningsSub')}
+          <p className="text-sm text-slate-400 mt-1">
+            Reconciled revenue metrics across cash and digital settlements
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">Live Settlement Status:</span>
-          <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            Active UPI QR & Cash Desk
-          </span>
+        <div className="flex items-center gap-2 p-1 bg-white/5 rounded-full border border-white/10">
+          <button
+            onClick={() => setFilterMethod('ALL')}
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+              filterMethod === 'ALL'
+                ? 'bg-sky-500 text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            All Registers
+          </button>
+          <button
+            onClick={() => setFilterMethod('ONLINE_UPI')}
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+              filterMethod === 'ONLINE_UPI'
+                ? 'bg-sky-500 text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            UPI & Digital
+          </button>
+          <button
+            onClick={() => setFilterMethod('CASH')}
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+              filterMethod === 'CASH'
+                ? 'bg-sky-500 text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Cash
+          </button>
         </div>
-      </div>
+      </section>
 
-      {/* Metric Tiles: Today, Week, Month */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>{t(language, 'totalToday')}</span>
-            <Calendar className="w-4 h-4 text-blue-600" />
+      {/* 2. Primary Metrics Row */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="display-card rounded-3xl p-8 space-y-2">
+          <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+            {t(language, 'totalToday')}
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">
+          <div className="text-4xl font-extrabold text-white font-mono">
             ₹1,250
           </div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-1 flex items-center gap-1">
-            <ArrowUpRight className="w-3 h-3" />
-            <span>+18% from yesterday</span>
+          <div className="text-sm text-emerald-400 font-medium">
+            Settled today
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>{t(language, 'totalWeek')}</span>
-            <Banknote className="w-4 h-4 text-emerald-600" />
+        <div className="display-card rounded-3xl p-8 space-y-2">
+          <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+            {t(language, 'totalWeek')}
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">
+          <div className="text-4xl font-extrabold text-white font-mono">
             ₹24,800
           </div>
-          <div className="text-[11px] text-slate-500 font-medium mt-1">
-            42 customer reservations settled
+          <div className="text-sm text-slate-400">
+            Current operational cycle
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
-            <span>{t(language, 'totalMonth')}</span>
-            <CreditCard className="w-4 h-4 text-purple-600" />
+        <div className="display-card rounded-3xl p-8 space-y-2">
+          <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+            {t(language, 'totalMonth')}
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">
+          <div className="text-4xl font-extrabold text-white font-mono">
             ₹89,500
           </div>
-          <div className="text-[11px] text-slate-500 font-medium mt-1">
-            Monthly gross booking revenue
+          <div className="text-sm text-slate-400">
+            Cumulative monthly receipts
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Payment Method Split Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-              <Banknote className="w-5 h-5" />
+      {/* 3. Method Split */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="display-card rounded-3xl p-6 flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              {t(language, 'cashTotal')}
             </div>
-            <div>
-              <span className="text-xs text-slate-500 font-medium">{t(language, 'cashTotal')}</span>
-              <div className="text-lg font-bold text-slate-900 mt-0.5">₹{totalCash}</div>
-            </div>
+            <div className="text-2xl font-bold text-white font-mono mt-1">₹{totalCash}</div>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">
-            Manual Register
+          <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">
+            Direct Register
           </span>
         </div>
 
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold">
-              <CreditCard className="w-5 h-5" />
+        <div className="display-card rounded-3xl p-6 flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              {t(language, 'onlineTotal')}
             </div>
-            <div>
-              <span className="text-xs text-slate-500 font-medium">{t(language, 'onlineTotal')}</span>
-              <div className="text-lg font-bold text-slate-900 mt-0.5">₹{totalOnline}</div>
-            </div>
+            <div className="text-2xl font-bold text-white font-mono mt-1">₹{totalOnline}</div>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
-            Direct UPI QR
+          <span className="px-4 py-1.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold">
+            Direct UPI
           </span>
         </div>
-      </div>
+      </section>
 
-      {/* Transaction Ledger Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 md:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h3 className="font-bold text-slate-900 text-sm">
-            {t(language, 'transactionLedger')}
-          </h3>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFilterMethod('ALL')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                filterMethod === 'ALL'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilterMethod('ONLINE_UPI')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                filterMethod === 'ONLINE_UPI'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              Online / UPI
-            </button>
-            <button
-              onClick={() => setFilterMethod('CASH')}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                filterMethod === 'CASH'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              Cash
-            </button>
-          </div>
-        </div>
+      {/* 4. Ledger Table */}
+      <section className="display-canvas rounded-3xl p-8 border border-white/10 overflow-hidden">
+        <h3 className="text-xl font-bold text-white pb-6 border-b border-white/10">
+          {t(language, 'transactionLedger')}
+        </h3>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs uppercase tracking-wider text-slate-400 border-b border-white/10">
               <tr>
-                <th className="py-3 px-4">{t(language, 'colCustomer')}</th>
-                <th className="py-3 px-4">{t(language, 'colService')}</th>
-                <th className="py-3 px-4">{t(language, 'colAmount')}</th>
-                <th className="py-3 px-4">{t(language, 'colMethod')}</th>
-                <th className="py-3 px-4">{t(language, 'colTime')}</th>
-                <th className="py-3 px-4">{t(language, 'colStatus')}</th>
+                <th className="py-4 px-4">Client</th>
+                <th className="py-4 px-4">Service</th>
+                <th className="py-4 px-4">Amount</th>
+                <th className="py-4 px-4">Method</th>
+                <th className="py-4 px-4">Settled Window</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredTx.map((tx) => (
-                <tr key={tx.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-slate-900">
-                    {tx.customerName}
-                  </td>
-                  <td className="py-3 px-4">{tx.serviceName}</td>
-                  <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                    ₹{tx.amount}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                        tx.method === 'ONLINE_UPI'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      }`}
-                    >
-                      {tx.method === 'ONLINE_UPI' ? 'UPI Online' : 'Cash'}
+            <tbody className="divide-y divide-white/5 text-slate-300">
+              {filtered.map((tx) => (
+                <tr key={tx.id} className="hover:bg-white/5 transition-colors">
+                  <td className="py-4 px-4 font-bold text-white">{tx.customerName}</td>
+                  <td className="py-4 px-4 text-slate-300">{tx.serviceName}</td>
+                  <td className="py-4 px-4 font-mono font-bold text-white text-base">₹{tx.amount}</td>
+                  <td className="py-4 px-4">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-slate-300">
+                      {tx.method === 'ONLINE_UPI' ? 'UPI' : 'Cash'}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500">
-                    {tx.date}, {tx.time}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">
-                      {tx.status}
-                    </span>
-                  </td>
+                  <td className="py-4 px-4 text-slate-400 text-xs">{tx.date}, {tx.time}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

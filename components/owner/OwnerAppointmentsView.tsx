@@ -3,17 +3,6 @@
 import React, { useState } from 'react';
 import { Language, Appointment, AppointmentStatus } from '@/lib/booking-types';
 import { t } from '@/lib/translations';
-import {
-  Calendar,
-  Clock,
-  Phone,
-  MapPin,
-  CheckCircle2,
-  XCircle,
-  FileText,
-  User,
-  Filter,
-} from 'lucide-react';
 
 interface Props {
   language: Language;
@@ -35,122 +24,109 @@ export const OwnerAppointmentsView: React.FC<Props> = ({
   );
 
   return (
-    <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-8 gap-6 max-w-7xl mx-auto w-full overflow-y-auto">
-      {/* Top Banner */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="flex-1 flex flex-col p-6 lg:p-12 gap-8 max-w-7xl mx-auto w-full">
+      {/* Top Banner & Tab Controls */}
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
+          <h2 className="text-3xl font-extrabold text-white tracking-tight">
             {t(language, 'appointmentsTitle')}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {t(language, 'appointmentsSub')}
+          <p className="text-sm text-slate-400 mt-1">
+            Confirmed client appointments and session logs
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center p-1 bg-slate-100 rounded-lg">
+        <div className="flex items-center gap-2 p-1 bg-white/5 rounded-full border border-white/10">
           <button
             onClick={() => setActiveTab('UPCOMING')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
               activeTab === 'UPCOMING'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-sky-500 text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             {t(language, 'tabUpcoming')} ({appointments.filter((a) => a.status === 'UPCOMING').length})
           </button>
-
           <button
             onClick={() => setActiveTab('HISTORY')}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+            className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
               activeTab === 'HISTORY'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-sky-500 text-slate-950 font-bold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             {t(language, 'tabHistory')} ({appointments.filter((a) => a.status !== 'UPCOMING').length})
           </button>
         </div>
-      </div>
+      </section>
 
       {/* Appointments List */}
-      <div className="space-y-3">
+      <section className="space-y-4">
         {filtered.length === 0 ? (
-          <div className="bg-white p-12 text-center rounded-xl border border-slate-200 shadow-xs text-slate-400 text-xs">
+          <div className="display-card rounded-3xl p-16 text-center text-slate-400 text-base">
             {t(language, 'noAppointments')}
           </div>
         ) : (
           filtered.map((apt) => (
             <div
               key={apt.id}
-              className="bg-white p-4 md:p-5 rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="display-card rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all"
             >
-              {/* Left Details */}
-              <div className="space-y-1.5 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-bold text-slate-900">
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-xl font-bold text-white">
                     {apt.customerName}
                   </span>
-                  <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1">
-                    <Phone className="w-3 h-3 text-slate-400" />
+                  <span className="text-xs font-mono text-slate-400">
                     {apt.customerPhone}
                   </span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       apt.paymentStatus === 'PAID'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     }`}
                   >
                     {apt.paymentStatus} ({apt.paymentMethod === 'ONLINE_UPI' ? 'UPI' : 'Cash'})
                   </span>
                 </div>
 
-                <div className="text-xs text-slate-700 font-medium">
-                  {language === 'hi' && apt.serviceHindiName ? apt.serviceHindiName : apt.serviceName} • <span className="font-bold text-slate-900 font-mono">₹{apt.price}</span>
+                <div className="text-base text-slate-200 font-medium">
+                  {language === 'hi' && apt.serviceHindiName ? apt.serviceHindiName : apt.serviceName} • <span className="font-bold text-white font-mono">₹{apt.price}</span>
                 </div>
 
-                <div className="flex items-center gap-4 text-xs text-slate-500 pt-0.5 flex-wrap">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-blue-600" />
-                    {apt.date} at {apt.time}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    {apt.locationName}
-                  </span>
-                  {apt.notes && (
-                    <span className="flex items-center gap-1 italic text-slate-400 text-[11px]">
-                      <FileText className="w-3 h-3" />
-                      &quot;{apt.notes}&quot;
-                    </span>
-                  )}
+                <div className="text-sm text-slate-400 pt-1">
+                  {apt.date} at {apt.time} • {apt.locationName}
                 </div>
+
+                {apt.notes && (
+                  <div className="text-xs text-slate-400 italic pt-1">
+                    &quot;{apt.notes}&quot;
+                  </div>
+                )}
               </div>
 
-              {/* Right Action Buttons */}
               {apt.status === 'UPCOMING' && (
-                <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                <div className="flex items-center gap-3 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-white/5">
                   <button
                     onClick={() => onUpdateStatus(apt.id, 'COMPLETED')}
-                    className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-xs transition-colors"
+                    className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs tracking-wide transition-all"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{t(language, 'markComplete')}</span>
+                    {t(language, 'markComplete')}
                   </button>
 
                   <button
                     onClick={() => onUpdateStatus(apt.id, 'CANCELLED')}
-                    className="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-600 text-xs font-medium transition-colors"
+                    className="px-5 py-2.5 rounded-full border border-white/10 hover:bg-white/5 text-slate-300 text-xs font-medium transition-all"
                   >
-                    <span>{t(language, 'cancelBooking')}</span>
+                    {t(language, 'cancelBooking')}
                   </button>
                 </div>
               )}
             </div>
           ))
         )}
-      </div>
+      </section>
     </div>
   );
 };
