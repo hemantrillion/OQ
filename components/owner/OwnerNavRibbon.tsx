@@ -4,7 +4,7 @@ import React from 'react';
 import { Language } from '@/lib/booking-types';
 import { t } from '@/lib/translations';
 
-export type OwnerTab = 'SCHEDULE' | 'APPOINTMENTS' | 'EARNINGS' | 'PROFILE';
+export type OwnerTab = 'FRONTPAGE' | 'APPOINTMENTS' | 'EARNINGS' | 'OPERATOR';
 
 interface Props {
   language: Language;
@@ -22,18 +22,18 @@ export const OwnerNavRibbon: React.FC<Props> = ({
   badgeCounts,
 }) => {
   const tabs: Array<{ id: OwnerTab; label: string; badge?: number }> = [
-    { id: 'SCHEDULE', label: t(language, 'navSchedule') },
+    { id: 'FRONTPAGE', label: t(language, 'navFrontpage') },
     {
       id: 'APPOINTMENTS',
       label: t(language, 'navAppointments'),
       badge: badgeCounts.upcomingAppointments,
     },
     { id: 'EARNINGS', label: t(language, 'navEarnings') },
-    { id: 'PROFILE', label: t(language, 'navProfile') },
+    { id: 'OPERATOR', label: t(language, 'navOperator') },
   ];
 
   return (
-    <nav className="px-6 lg:px-12 flex items-center gap-8 border-b border-white/5 bg-black/10 overflow-x-auto scrollbar-none">
+    <nav className="px-6 lg:px-16 flex items-center gap-6 bg-transparent overflow-x-auto scrollbar-none select-none py-2">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
@@ -41,15 +41,15 @@ export const OwnerNavRibbon: React.FC<Props> = ({
           <button
             key={tab.id}
             onClick={() => onSelectTab(tab.id)}
-            className={`py-4 border-b-2 text-sm font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 ${
+            className={`min-w-[140px] py-3 text-sm font-bold tracking-wide whitespace-nowrap transition-all flex items-center justify-center gap-2 rounded-full ${
               isActive
-                ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
             }`}
           >
             <span>{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-sky-500 text-slate-950">
                 {tab.badge}
               </span>
             )}

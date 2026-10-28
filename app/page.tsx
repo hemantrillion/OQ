@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Language,
   UserRole,
@@ -16,9 +16,11 @@ import {
 } from '@/lib/booking-data';
 
 // Views
+import { StartView } from '@/components/auth/StartView';
 import { OwnerTopNav } from '@/components/owner/OwnerTopNav';
 import { OwnerNavRibbon, OwnerTab } from '@/components/owner/OwnerNavRibbon';
 import { OwnerHomeView } from '@/components/owner/OwnerHomeView';
+import { OwnerSlotsView } from '@/components/owner/OwnerSlotsView';
 import { OwnerAppointmentsView } from '@/components/owner/OwnerAppointmentsView';
 import { OwnerEarningsView } from '@/components/owner/OwnerEarningsView';
 import { OwnerProfileView } from '@/components/owner/OwnerProfileView';
@@ -26,13 +28,15 @@ import { CustomerMapView } from '@/components/customer/CustomerMapView';
 import { FullPageAiChatView } from '@/components/ai/FullPageAiChatView';
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [language, setLanguage] = useState<Language>('en');
   const [currentRole, setCurrentRole] = useState<UserRole>('OWNER');
-  const [ownerTab, setOwnerTab] = useState<OwnerTab>('SCHEDULE');
+  const [ownerTab, setOwnerTab] = useState<OwnerTab>('FRONTPAGE');
+  const [isSlotsPageOpen, setIsSlotsPageOpen] = useState(false);
   const [aiChatOpen, setAiChatOpen] = useState(false);
 
   // Business and Operating State
-  const [business] = useState<BusinessProfile>(INITIAL_BUSINESS);
+  const [business, setBusiness] = useState<BusinessProfile>(INITIAL_BUSINESS);
   const [slots, setSlots] = useState<Slot[]>(INITIAL_SLOTS);
   const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
   const [isOnline, setIsOnline] = useState<boolean>(true);
@@ -42,14 +46,19 @@ export default function Home() {
     setLanguage((prev) => (prev === 'en' ? 'hi' : 'en'));
   };
 
-  // Online / Offline toggle with smart booking lock
-  const handleToggleOnline = (nextState: boolean): boolean => {
-    const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
-    if (!nextState && isOnline && upcomingCount > 0) {
-      return false;
-    }
+  // Online / Offline toggle direct
+  const handleToggleOnline = (nextState: boolean) => {
     setIsOnline(nextState);
-    return true;
+  };
+
+  // Offline cancellation notice execution
+  const handleCancelBookingsAndGoOffline = (cancelledIds: string[], emailBody: string) => {
+    // Mark affected appointments cancelled
+    setAppointments((prev) =>
+      prev.map((a) => (cancelledIds.includes(a.id) ? { ...a, status: 'CANCELLED' } : a))
+    );
+    // Put operations offline
+    setIsOnline(false);
   };
 
   // Add new operating slot
@@ -58,15 +67,34 @@ export default function Home() {
       id: `slt_${Date.now()}`,
       locationId: newSlotData.locationId || business.locations[0].id,
       locationName: newSlotData.locationName || business.locations[0].name,
+      jobProfile: newSlotData.jobProfile || 'Standard Service',
       date: newSlotData.date || '2026-10-30',
       startTime: newSlotData.startTime || '11:00 AM',
       endTime: newSlotData.endTime || '11:45 AM',
-      capacity: newSlotData.capacity || 1,
+      capacity: newSlotData.capacity || 2,
       bookedCount: 0,
       status: 'OPEN',
       assignedStaff: newSlotData.assignedStaff || business.ownerName,
     };
     setSlots((prev) => [newSlot, ...prev]);
+  };
+
+  // Configure New Venture (Naya Rozgar)
+  const handleConfigureNewBusiness = (venture: { name: string; sector: string; address: string }) => {
+    const newLoc = {
+      id: `loc_${Date.now()}`,
+      name: `${venture.name} (Station 1)`,
+      address: venture.address || 'Central Plaza',
+      city: 'Pune',
+      lat: 18.5204,
+      lng: 73.8567,
+      isPrimary: false,
+    };
+
+    setBusiness((prev) => ({
+      ...prev,
+      locations: [...prev.locations, newLoc],
+    }));
   };
 
   // Update appointment status
@@ -76,7 +104,21 @@ export default function Home() {
     );
   };
 
-  // Full-Page AI View (Living Water Orb Interaction)
+  // 1. Logged Out View (Start View)
+  if (!isLoggedIn) {
+    return (
+      <StartView
+        language={language}
+        onEnterApp={(role) => {
+          setCurrentRole(role);
+          setIsLoggedIn(true);
+        }}
+        onToggleLanguage={handleToggleLanguage}
+      />
+    );
+  }
+
+  // 2. Full-Page AI View (Living Water Orb Interaction)
   if (aiChatOpen) {
     return (
       <FullPageAiChatView
@@ -87,7 +129,7 @@ export default function Home() {
     );
   }
 
-  // Client Discovery Map View
+  // 3. Customer Portal View (ग्राहक द्वार)
   if (currentRole === 'CUSTOMER') {
     return (
       <CustomerMapView
@@ -98,7 +140,7 @@ export default function Home() {
     );
   }
 
-  // Operator Workspace: Deslot
+  // 4. Operator Workspace: Deslot
   const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
 
   return (
@@ -110,15 +152,20 @@ export default function Home() {
         appointments={appointments}
         isOnline={isOnline}
         onToggleOnline={handleToggleOnline}
+        onCancelBookingsAndGoOffline={handleCancelBookingsAndGoOffline}
         onToggleLanguage={handleToggleLanguage}
         onSwitchToCustomer={() => setCurrentRole('CUSTOMER')}
+        onLogout={() => setIsLoggedIn(false)}
       />
 
-      {/* Navigation Ribbon */}
+      {/* Navigation Ribbon (No dividing horizontal lines) */}
       <OwnerNavRibbon
         language={language}
         activeTab={ownerTab}
-        onSelectTab={setOwnerTab}
+        onSelectTab={(tab) => {
+          setOwnerTab(tab);
+          setIsSlotsPageOpen(false);
+        }}
         badgeCounts={{
           upcomingAppointments: upcomingCount,
         }}
@@ -126,13 +173,24 @@ export default function Home() {
 
       {/* Main Single Continuous Surface */}
       <main className="flex-1 flex flex-col">
-        {ownerTab === 'SCHEDULE' && (
+        {ownerTab === 'FRONTPAGE' && !isSlotsPageOpen && (
           <OwnerHomeView
             language={language}
             business={business}
-            slots={slots}
-            appointments={appointments}
+            onNavigateToSlots={() => setIsSlotsPageOpen(true)}
+            onOpenCreateSlot={() => setIsSlotsPageOpen(true)}
             onOpenAiChat={() => setAiChatOpen(true)}
+            onConfigureNewBusiness={handleConfigureNewBusiness}
+          />
+        )}
+
+        {/* Dedicated Slots Page (Accessible only from Frontpage) */}
+        {ownerTab === 'FRONTPAGE' && isSlotsPageOpen && (
+          <OwnerSlotsView
+            language={language}
+            business={business}
+            slots={slots}
+            onBackToFrontpage={() => setIsSlotsPageOpen(false)}
             onAddSlot={handleAddSlot}
           />
         )}
@@ -149,7 +207,7 @@ export default function Home() {
           <OwnerEarningsView language={language} />
         )}
 
-        {ownerTab === 'PROFILE' && (
+        {ownerTab === 'OPERATOR' && (
           <OwnerProfileView
             language={language}
             business={business}

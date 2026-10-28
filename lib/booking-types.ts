@@ -28,11 +28,12 @@ export interface Slot {
   id: string;
   locationId: string;
   locationName: string;
+  jobProfile?: string; // Job segregation (Haircut, Shave, Consultation, etc.)
   date: string; // YYYY-MM-DD
   startTime: string; // e.g., '10:00 AM'
   endTime: string; // e.g., '10:45 AM'
-  capacity: number;
-  bookedCount: number;
+  capacity: number; // Cap on appointments
+  bookedCount: number; // Current appointments count
   status: SlotStatus;
   assignedStaff?: string;
 }
@@ -133,10 +134,4 @@ export interface ChatMessage {
   text: string;
   hindiText?: string;
   timestamp: string;
-  intent?: 'SLOT_CREATION' | 'SERVICE_UPDATE' | 'QUERY_EARNINGS' | 'GENERAL';
-  suggestedAction?: {
-    label: string;
-    actionType: string;
-    payload?: any;
-  };
 }

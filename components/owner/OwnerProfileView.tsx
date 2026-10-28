@@ -17,7 +17,7 @@ export const OwnerProfileView: React.FC<Props> = ({
   onSwitchToCustomer,
 }) => {
   return (
-    <div className="flex-1 flex flex-col p-6 lg:p-12 gap-12 max-w-7xl mx-auto w-full">
+    <div className="flex-1 flex flex-col p-6 lg:p-12 gap-12 max-w-7xl mx-auto w-full select-none">
       {/* 1. OPERATOR IDENTITY SECTION */}
       <section className="display-card rounded-3xl p-8 lg:p-10 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
@@ -32,9 +32,9 @@ export const OwnerProfileView: React.FC<Props> = ({
 
           <button
             onClick={onSwitchToCustomer}
-            className="px-6 py-2.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-all"
+            className="w-40 py-2.5 rounded-full border border-sky-400/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-xs font-bold tracking-wide transition-all text-center"
           >
-            {t(language, 'switchToCustomer')}
+            {t(language, 'customerPortal')}
           </button>
         </div>
 
@@ -57,7 +57,7 @@ export const OwnerProfileView: React.FC<Props> = ({
             <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
               Operational Scope
             </span>
-            <div className="text-base text-white">{business.locations.length} Stations Active</div>
+            <div className="text-base text-white">{business.locations.length} Stations Configured</div>
           </div>
         </div>
       </section>

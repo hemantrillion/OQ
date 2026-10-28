@@ -3,39 +3,77 @@ import { Language } from './booking-types';
 export const DICTIONARY = {
   en: {
     appName: 'Deslot',
+    operatorTitle: 'Operator',
+    ownerLabel: 'Rajesh Sharma',
+    customerPortal: 'Customer Portal',
+    switchToOwner: 'Operator Desk',
+    logout: 'Log Out',
     statusOnline: 'Taking Bookings',
-    statusOffline: 'Closed for Bookings',
-    toggleGoOffline: 'Pause Operations',
-    toggleGoOnline: 'Open Operations',
-    offlineBlockedTitle: 'Active Bookings in Progress',
-    offlineBlockedDesc:
-      'You have upcoming confirmed appointments in this current time window. Please fulfill or reschedule them before pausing operations.',
+    statusOffline: 'Operations Paused',
+    toggleGoOffline: 'Go Offline',
+    toggleGoOnline: 'Go Online',
 
-    // Navigation
-    navSchedule: 'Schedule & Slots',
+    // Offline Cancellation Flow
+    offlineRangeTitle: 'Specify Inactive Duration',
+    offlineRangeSub: 'Select the operational window during which you will pause bookings.',
+    fromDateLabel: 'From Date & Time',
+    toDateLabel: 'To Date & Time',
+    confirmCancelQuery: 'Do you really intend to cancel confirmed reservations?',
+    confirmCancelWarning: 'Active customer bookings detected in this window. Proceeding will trigger immediate cancellation emails.',
+    cancellationEmailTitle: 'Draft Client Cancellation Email',
+    cancellationEmailSub: 'Compose the cancellation message that will be dispatched to all affected clients.',
+    emailSubjectLabel: 'Subject Line',
+    emailSubjectDefault: 'Important: Cancellation of your upcoming appointment at Deslot',
+    emailBodyLabel: 'Message to Clients',
+    emailBodyDefault: 'Dear client,\n\nWe regret to inform you that our operations will be temporarily paused during your booked time slot due to unforeseen schedule adjustments. Your appointment has been cancelled and any fees will be refunded immediately.\n\nWarm regards,\nRajesh Sharma (Deslot)',
+    dispatchCancelBtn: 'Send Email Notice & Pause Operations',
+    cancelAbortBtn: 'Return to Operations (Keep Bookings)',
+
+    // Navigation Tabs
+    navFrontpage: 'Frontpage',
     navAppointments: 'Reservations',
     navEarnings: 'Revenue',
-    navProfile: 'Identity & Architecture',
-    switchToCustomer: 'Client Discovery',
-    switchToOwner: 'Operator Desk',
+    navOperator: 'Operator',
 
-    // Home / Display Workspace
-    heroTitle: 'Universal Booking Operations',
-    heroSubtitle: 'Manage capacity, dynamic branches, and live bookings seamlessly.',
-    aiTriggerPrompt: 'Speak or write instructions to manage capacity, rates, and slots.',
-    createSlotTitle: 'Publish New Slot',
-    dateLabel: 'Date',
-    timeSlotLabel: 'Operating Window',
-    stationLabel: 'Assigned Station',
-    capacityLabel: 'Concurrent Capacity',
-    publishBtn: 'Publish Slot',
-    noSlotsMsg: 'No operating slots published for this filter. Create one to begin accepting clients.',
+    // Frontpage
+    frontHeroTitle: 'Universal Booking Operations',
+    frontHeroSub: 'Seamless capacity scheduling, multiple business branches, and unified appointment control.',
+    aiPromptHint: 'Tap the flowing water orb to speak or command AI operations directly.',
+    actionMySlots: 'My Slots',
+    actionMySlotsSub: 'Inspect active capacity, bookings, and remaining seats per station.',
+    actionCreateSlot: 'Create Slot',
+    actionCreateSlotSub: 'Publish new operating windows with customized client seat caps.',
+    actionNewBusiness: 'New Venture',
+    actionNewBusinessSub: 'Configure a new enterprise sector, shop, or clinic location.',
+
+    // Dedicated Slots Page
+    slotsPageTitle: 'Capacity & Slot Management',
+    slotsPageSub: 'Segregate operating windows by service trade, station, and custom seat limits.',
+    filterAllJobs: 'All Job Profiles',
+    filterAllStations: 'All Stations',
+    createSlotBtn: 'Publish New Slot',
+    jobLabel: 'Service / Job Profile',
+    stationLabel: 'Operating Station',
+    capacityCapLabel: 'Maximum Seat Cap',
+    windowLabel: 'Timing Window',
+    seatsLeft: 'seats remaining',
+    seatsBooked: 'booked',
+    slotFull: 'Fully Booked',
+    backToFrontpage: 'Back to Frontpage',
+
+    // New Venture Modal
+    newVentureTitle: 'Configure New Venture',
+    newVentureSub: 'Launch another profession or enterprise branch under your Deslot account.',
+    ventureNameLabel: 'Enterprise Name',
+    ventureSectorLabel: 'Trade / Sector',
+    ventureLocationLabel: 'Location Address',
+    saveVentureBtn: 'Register Venture',
 
     // Appointments
     appointmentsTitle: 'Client Reservations',
     tabUpcoming: 'Upcoming',
-    tabHistory: 'Completed',
-    noAppointments: 'No client appointments in this section.',
+    tabHistory: 'Completed History',
+    noAppointments: 'No client appointments found in this section.',
     markComplete: 'Complete Service',
     cancelBooking: 'Cancel',
 
@@ -44,19 +82,19 @@ export const DICTIONARY = {
     totalToday: 'Today',
     totalWeek: 'This Week',
     totalMonth: 'This Month',
-    cashTotal: 'Cash Settlements',
+    cashTotal: 'Cash Register',
     onlineTotal: 'Direct UPI & Digital',
     transactionLedger: 'Settlement Register',
 
-    // Profile & Data Architecture
-    profileTitle: 'Operator Profile',
+    // Operator / Profile
+    operatorDetailsTitle: 'Operator Profile',
     dataArchitectureTitle: 'Data Architecture & Schema',
-    dataArchitectureSub: 'Relational blueprint of tables, keys, and joins configured for this business.',
+    dataArchitectureSub: 'Relational specification of tables, primary/foreign keys, and joins.',
     subviewTable: 'Table Specifications',
     subviewRelationship: '2D Relational Map',
 
-    // Customer
-    customerMapTitle: 'Available Booking Points',
+    // Customer Portal (ग्राहक द्वार)
+    customerMapTitle: 'Customer Portal',
     searchPlaceholder: 'Search locations, specialties, or services...',
     bookNow: 'Reserve Slot',
     confirmBooking: 'Confirm Reservation',
@@ -65,40 +103,77 @@ export const DICTIONARY = {
     bookingSuccess: 'Reservation Confirmed',
 
     // AI Full-Page
-    aiChatTitle: 'Operations Intelligence',
-    aiChatSubtitle: 'Direct conversational control over slots, rates, and configuration.',
-    typeMessagePlaceholder: 'Speak or type any directive (e.g., "Add 3 afternoon slots for Dr. Sharma")...',
+    aiChatTitle: 'Deslot AI Assistant',
+    typeMessagePlaceholder: 'Speak or type any command (e.g. "Add 3 haircut slots for tomorrow at Main Chair")...',
   },
 
   hi: {
     appName: 'Deslot',
+    operatorTitle: 'चालक',
+    ownerLabel: 'राजेश शर्मा',
+    customerPortal: 'ग्राहक द्वार',
+    switchToOwner: 'संचालक डेस्क',
+    logout: 'बाहर निकलें',
     statusOnline: 'बुकिंग चालू है',
-    statusOffline: 'बुकिंग बंद है',
+    statusOffline: 'सेवा बंद है',
     toggleGoOffline: 'सेवा रोकें',
     toggleGoOnline: 'सेवा चालू करें',
-    offlineBlockedTitle: 'सक्रिय बुकिंग्स मौजूद हैं',
-    offlineBlockedDesc:
-      'इस समय में आपकी पुष्टि की गई बुकिंग्स पहले से मौजूद हैं। सेवा रोकने से पहले कृपया उन्हें पूरा करें या नया समय दें।',
 
-    // Navigation
-    navSchedule: 'समय एवं स्लॉट',
+    // Offline Cancellation Flow
+    offlineRangeTitle: 'सेवा स्थगन समय चुनें',
+    offlineRangeSub: 'उस समय अवधि का चयन करें जिसके दौरान आप बुकिंग स्वीकार नहीं करेंगे।',
+    fromDateLabel: 'प्रारंभ तिथि एवं समय',
+    toDateLabel: 'समाप्ति तिथि एवं समय',
+    confirmCancelQuery: 'क्या आप सच में इन बुकिंग्स को रद्द करना चाहते हैं?',
+    confirmCancelWarning: 'इस समय अंतराल में ग्राहकों की सक्रिय बुकिंग मौजूद है। आगे बढ़ने पर ग्राहकों को तुरंत रद्दीकरण ईमेल भेजा जाएगा।',
+    cancellationEmailTitle: 'रद्दीकरण ईमेल का प्रारूप',
+    cancellationEmailSub: 'वह संदेश लिखें जो प्रभावित सभी ग्राहकों को ईमेल द्वारा भेजा जाएगा।',
+    emailSubjectLabel: 'विषय',
+    emailSubjectDefault: 'महत्वपूर्ण सूचना: Deslot पर आपकी आगामी बुकिंग का रद्दीकरण',
+    emailBodyLabel: 'ग्राहकों के लिए संदेश',
+    emailBodyDefault: 'प्रिय ग्राहक,\n\nअपरिहार्य कारणों से हमारे संचालन में अस्थायी रुकावट के कारण आपकी बुक की गई अपॉइंटमेंट रद्द कर दी गई है। किसी भी अग्रिम भुगतान का तुरंत रिफंड कर दिया जाएगा।\n\nसस्नेह,\nराजेश शर्मा (Deslot)',
+    dispatchCancelBtn: 'ईमेल सूचना भेजें एवं सेवा रोकें',
+    cancelAbortBtn: 'वापस जाएं (बुकिंग्स जारी रखें)',
+
+    // Navigation Tabs
+    navFrontpage: 'मुखपृष्ठ',
     navAppointments: 'बुकिंग सूची',
     navEarnings: 'आय विवरण',
-    navProfile: 'प्रोफाइल एवं संरचना',
-    switchToCustomer: 'ग्राहक खोज',
-    switchToOwner: 'संचालक डेस्क',
+    navOperator: 'चालक',
 
-    // Home / Display Workspace
-    heroTitle: 'बुकिंग एवं संसाधन प्रबंधन',
-    heroSubtitle: 'क्षमता, स्थान और ग्राहकों की बुकिंग का सुव्यवस्थित संचालन।',
-    aiTriggerPrompt: 'स्लॉट, सेवाएं और समय निर्धारित करने के लिए बोलें या लिखें।',
-    createSlotTitle: 'नया समय स्लॉट जोड़ें',
-    dateLabel: 'तारीख',
-    timeSlotLabel: 'समय अंतराल',
+    // Frontpage
+    frontHeroTitle: 'बुकिंग एवं संसाधन प्रबंधन',
+    frontHeroSub: 'समय अंतराल, शाखाओं और ग्राहक बुकिंग का आधुनिक संचालन।',
+    aiPromptHint: 'एआई को आवाज़ या लिखकर निर्देश देने के लिए तरल जल चक्र को टैप करें।',
+    actionMySlots: 'मेरे स्लॉट',
+    actionMySlotsSub: 'सक्रिय क्षमता, बुकिंग और बची हुई सीटों की स्थिति जांचें।',
+    actionCreateSlot: 'नया स्लॉट बनाएं',
+    actionCreateSlotSub: 'सीट सीमा के साथ नए ऑपरेटिंग समय स्लॉट प्रकाशित करें।',
+    actionNewBusiness: 'नया रोज़गार',
+    actionNewBusinessSub: 'अपने खाते के तहत नया व्यवसाय या कार्य क्षेत्र कॉन्फ़िगर करें।',
+
+    // Dedicated Slots Page
+    slotsPageTitle: 'समय एवं क्षमता प्रबंधन',
+    slotsPageSub: 'कार्य प्रकार, स्थान और सीट सीमा के अनुसार स्लॉट प्रबंधित करें।',
+    filterAllJobs: 'सभी कार्य प्रकार',
+    filterAllStations: 'सभी कार्य स्थल',
+    createSlotBtn: 'नया स्लॉट जोड़ें',
+    jobLabel: 'कार्य / सेवा का प्रकार',
     stationLabel: 'स्थान / कुर्सी',
-    capacityLabel: 'सीट क्षमता',
-    publishBtn: 'स्लॉट प्रकाशित करें',
-    noSlotsMsg: 'इस चयन के लिए कोई स्लॉट उपलब्ध नहीं है। नया स्लॉट जोड़ें।',
+    capacityCapLabel: 'अधिकतम सीट सीमा (Cap)',
+    windowLabel: 'समय अंतराल',
+    seatsLeft: 'सीटें शेष',
+    seatsBooked: 'बुक',
+    slotFull: 'पूर्ण रूप से बुक',
+    backToFrontpage: 'मुखपृष्ठ पर वापस',
+
+    // New Venture Modal
+    newVentureTitle: 'नया रोज़गार जोड़ें',
+    newVentureSub: 'अपने Deslot खाते में नई शाखा या कार्य क्षेत्र शुरू करें।',
+    ventureNameLabel: 'व्यवसाय का नाम',
+    ventureSectorLabel: 'क्षेत्र / व्यवसाय',
+    ventureLocationLabel: 'कार्य स्थल का पता',
+    saveVentureBtn: 'नया रोज़गार पंजीकृत करें',
 
     // Appointments
     appointmentsTitle: 'ग्राहकों की बुकिंग',
@@ -113,19 +188,19 @@ export const DICTIONARY = {
     totalToday: 'आज की आय',
     totalWeek: 'इस सप्ताह',
     totalMonth: 'इस महीने',
-    cashTotal: 'नकद भुगतान',
-    onlineTotal: 'यूपीआई एवं डिजिटल भुगतान',
+    cashTotal: 'नकद रजिस्टर',
+    onlineTotal: 'यूपीआई एवं डिजिटल',
     transactionLedger: 'लेनदेन पंजी',
 
-    // Profile & Data Architecture
-    profileTitle: 'संचालक विवरण',
+    // Operator / Profile
+    operatorDetailsTitle: 'चालक प्रोफाइल',
     dataArchitectureTitle: 'डेटा संरचना एवं रिलेशनल स्कीमा',
-    dataArchitectureSub: 'इस व्यवसाय के लिए कॉन्फ़िगर की गई तालिकाओं, प्राथमिक एवं विदेशी कुंजियों का ब्लूप्रिंट।',
+    dataArchitectureSub: 'व्यवसाय की तालिकाओं, प्राथमिक एवं विदेशी कुंजियों का ब्लूप्रिंट।',
     subviewTable: 'तालिका विवरण',
     subviewRelationship: '2D रिलेशनल मानचित्र',
 
-    // Customer
-    customerMapTitle: 'उपलब्ध सेवा केंद्र',
+    // Customer Portal (ग्राहक द्वार)
+    customerMapTitle: 'ग्राहक द्वार',
     searchPlaceholder: 'स्थान या सेवा खोजें...',
     bookNow: 'समय बुक करें',
     confirmBooking: 'बुकिंग की पुष्टि करें',
@@ -134,12 +209,34 @@ export const DICTIONARY = {
     bookingSuccess: 'बुकिंग सफलतापूर्वक दर्ज की गई',
 
     // AI Full-Page
-    aiChatTitle: 'संचालन सहायक',
-    aiChatSubtitle: 'स्लॉट, दर और कॉन्फ़िगरेशन के लिए प्रत्यक्ष संवाद।',
-    typeMessagePlaceholder: 'कोई निर्देश बोलें या लिखें (उदा. "कल दोपहर 3 बजे के 2 नए स्लॉट बनाएं")...',
+    aiChatTitle: 'Deslot एआई सहायक',
+    typeMessagePlaceholder: 'कोई आदेश बोलें या लिखें (उदा. "कल के लिए 3 नए हेयरकट स्लॉट बनाएं")...',
   },
 };
 
 export function t(lang: Language, key: keyof typeof DICTIONARY['en']): string {
   return DICTIONARY[lang][key] || DICTIONARY['en'][key] || String(key);
+}
+
+// Dynamic bilingual transliteration / text converter
+export function localizeText(text: string, lang: Language): string {
+  if (lang === 'en') return text;
+  const translationMap: Record<string, string> = {
+    'Rajesh Sharma': 'राजेश शर्मा',
+    'Modern Cuts Grooming Studio': 'मॉडर्न कट्स ग्रूमिंग स्टूडियो',
+    'Main Studio (Downtown Chair 1 & 2)': 'मुख्य स्टूडियो (कुर्सी 1 और 2)',
+    'East Wing Studio (Chair 3)': 'ईस्ट विंग स्टूडियो (कुर्सी 3)',
+    'Haircut': 'हेयरकट',
+    'Beard Trim': 'दाढ़ी ट्रिम',
+    'Consultation': 'परामर्श',
+    'Therapy': 'थेरेपी',
+    'Signature Haircut & Styling': 'हेयरकट एवं स्टाइलिंग',
+    'Beard Trim & Royal Hot Towel Shave': 'दाढ़ी ट्रिम एवं शेव',
+    'Herbal Scalp Massage & Wash': 'हर्बल सिर मालिश एवं वॉश',
+    'Complete Executive Grooming Combo': 'संपूर्ण ग्रूमिंग पैकेज',
+    'Dentistry': 'दंत चिकित्सा',
+    'Dine-in': 'डाइन-इन',
+    'Electronics': 'इलेक्ट्रॉनिक्स रिपेयर',
+  };
+  return translationMap[text] || text;
 }
