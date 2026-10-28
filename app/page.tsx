@@ -15,8 +15,13 @@ import {
   INITIAL_APPOINTMENTS,
 } from '@/lib/booking-data';
 
-// Views
-import { StartView } from '@/components/auth/StartView';
+// Onboarding Views (The pages that come in between taking details!)
+import { LanguageSelectView } from '@/components/onboarding/LanguageSelectView';
+import { RoleSelectView } from '@/components/onboarding/RoleSelectView';
+import { VerificationView } from '@/components/onboarding/VerificationView';
+import { BusinessProfileView } from '@/components/onboarding/BusinessProfileView';
+
+// Active Views
 import { OwnerTopNav } from '@/components/owner/OwnerTopNav';
 import { OwnerNavRibbon, OwnerTab } from '@/components/owner/OwnerNavRibbon';
 import { OwnerHomeView } from '@/components/owner/OwnerHomeView';
@@ -27,15 +32,19 @@ import { OwnerProfileView } from '@/components/owner/OwnerProfileView';
 import { CustomerMapView } from '@/components/customer/CustomerMapView';
 import { FullPageAiChatView } from '@/components/ai/FullPageAiChatView';
 
+export type OnboardingStep = 'LANGUAGE' | 'ROLE' | 'VERIFY' | 'PROFILE' | 'COMPLETED';
+
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  // Onboarding sequence state (starts at LANGUAGE so the user experiences the detail-taking flow)
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('LANGUAGE');
+
   const [language, setLanguage] = useState<Language>('en');
   const [currentRole, setCurrentRole] = useState<UserRole>('OWNER');
   const [ownerTab, setOwnerTab] = useState<OwnerTab>('FRONTPAGE');
   const [isSlotsPageOpen, setIsSlotsPageOpen] = useState(false);
   const [aiChatOpen, setAiChatOpen] = useState(false);
 
-  // Business and Operating State
+  // Business and Operating State (Default is Rajesh Sharma with his details)
   const [business, setBusiness] = useState<BusinessProfile>(INITIAL_BUSINESS);
   const [slots, setSlots] = useState<Slot[]>(INITIAL_SLOTS);
   const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
@@ -46,6 +55,49 @@ export default function Home() {
     setLanguage((prev) => (prev === 'en' ? 'hi' : 'en'));
   };
 
+  // Quick bypass straight to Rajesh Sharma workspace
+  const handleQuickEnterRajesh = () => {
+    setBusiness(INITIAL_BUSINESS);
+    setSlots(INITIAL_SLOTS);
+    setAppointments(INITIAL_APPOINTMENTS);
+    setCurrentRole('OWNER');
+    setOnboardingStep('COMPLETED');
+    setOwnerTab('FRONTPAGE');
+    setIsSlotsPageOpen(false);
+  };
+
+  // Onboarding Step Transitions
+  const handleLanguageProceed = () => {
+    setOnboardingStep('ROLE');
+  };
+
+  const handleRoleProceed = () => {
+    setOnboardingStep('VERIFY');
+  };
+
+  const handleVerificationProceed = (contact: { phone?: string; email?: string }) => {
+    if (contact.email) {
+      setBusiness((prev) => ({ ...prev, email: contact.email! }));
+    }
+    if (contact.phone) {
+      setBusiness((prev) => ({ ...prev, phone: contact.phone! }));
+    }
+
+    if (currentRole === 'CUSTOMER') {
+      setOnboardingStep('COMPLETED');
+    } else {
+      setOnboardingStep('PROFILE');
+    }
+  };
+
+  const handleProfileProceed = (newProfile: Partial<BusinessProfile>) => {
+    setBusiness((prev) => ({
+      ...prev,
+      ...newProfile,
+    }));
+    setOnboardingStep('COMPLETED');
+  };
+
   // Online / Offline toggle direct
   const handleToggleOnline = (nextState: boolean) => {
     setIsOnline(nextState);
@@ -53,11 +105,9 @@ export default function Home() {
 
   // Offline cancellation notice execution
   const handleCancelBookingsAndGoOffline = (cancelledIds: string[], emailBody: string) => {
-    // Mark affected appointments cancelled
     setAppointments((prev) =>
       prev.map((a) => (cancelledIds.includes(a.id) ? { ...a, status: 'CANCELLED' } : a))
     );
-    // Put operations offline
     setIsOnline(false);
   };
 
@@ -104,21 +154,58 @@ export default function Home() {
     );
   };
 
-  // 1. Logged Out View (Start View)
-  if (!isLoggedIn) {
+  // 1. ONBOARDING: Step 1 - Choose Language
+  if (onboardingStep === 'LANGUAGE') {
     return (
-      <StartView
-        language={language}
-        onEnterApp={(role) => {
-          setCurrentRole(role);
-          setIsLoggedIn(true);
-        }}
-        onToggleLanguage={handleToggleLanguage}
+      <LanguageSelectView
+        currentLanguage={language}
+        onSelectLanguage={setLanguage}
+        onProceed={handleLanguageProceed}
+        onQuickEnterRajesh={handleQuickEnterRajesh}
       />
     );
   }
 
-  // 2. Full-Page AI View (Living Water Orb Interaction)
+  // 1. ONBOARDING: Step 2 - Select Role
+  if (onboardingStep === 'ROLE') {
+    return (
+      <RoleSelectView
+        language={language}
+        selectedRole={currentRole}
+        onSelectRole={setCurrentRole}
+        onProceed={handleRoleProceed}
+        onBack={() => setOnboardingStep('LANGUAGE')}
+        onQuickEnterRajesh={handleQuickEnterRajesh}
+      />
+    );
+  }
+
+  // 1. ONBOARDING: Step 3 - Identity Verification (OTP)
+  if (onboardingStep === 'VERIFY') {
+    return (
+      <VerificationView
+        language={language}
+        userRole={currentRole}
+        onVerified={handleVerificationProceed}
+        onBack={() => setOnboardingStep('ROLE')}
+        onQuickEnterRajesh={handleQuickEnterRajesh}
+      />
+    );
+  }
+
+  // 1. ONBOARDING: Step 4 - Business Profile (Details Taking Step)
+  if (onboardingStep === 'PROFILE') {
+    return (
+      <BusinessProfileView
+        language={language}
+        onProfileCompleted={handleProfileProceed}
+        onBack={() => setOnboardingStep('VERIFY')}
+        onQuickEnterRajesh={handleQuickEnterRajesh}
+      />
+    );
+  }
+
+  // 2. ACTIVE WORKSPACE: FULL-PAGE AI CHAT (Living Water Orb Interaction)
   if (aiChatOpen) {
     return (
       <FullPageAiChatView
@@ -129,7 +216,7 @@ export default function Home() {
     );
   }
 
-  // 3. Customer Portal View (ग्राहक द्वार)
+  // 3. ACTIVE WORKSPACE: CUSTOMER PORTAL VIEW (ग्राहक द्वार)
   if (currentRole === 'CUSTOMER') {
     return (
       <CustomerMapView
@@ -140,7 +227,7 @@ export default function Home() {
     );
   }
 
-  // 4. Operator Workspace: Deslot
+  // 4. ACTIVE WORKSPACE: OPERATOR DESK (Deslot)
   const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
 
   return (
@@ -155,7 +242,7 @@ export default function Home() {
         onCancelBookingsAndGoOffline={handleCancelBookingsAndGoOffline}
         onToggleLanguage={handleToggleLanguage}
         onSwitchToCustomer={() => setCurrentRole('CUSTOMER')}
-        onLogout={() => setIsLoggedIn(false)}
+        onLogout={() => setOnboardingStep('LANGUAGE')}
       />
 
       {/* Navigation Ribbon (No dividing horizontal lines) */}
@@ -212,6 +299,7 @@ export default function Home() {
             language={language}
             business={business}
             onSwitchToCustomer={() => setCurrentRole('CUSTOMER')}
+            onRevisitOnboarding={() => setOnboardingStep('LANGUAGE')}
           />
         )}
       </main>
