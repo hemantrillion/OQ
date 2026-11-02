@@ -455,8 +455,8 @@ export const INITIAL_AI_CHAT_MESSAGES: ChatMessage[] = [
   {
     id: 'msg_1',
     sender: 'AI',
-    text: 'Greetings Rajesh. Deslot operations engine is active. State your operational directive or inquiry.',
-    hindiText: 'नमस्ते राजेश। Deslot संचालन इंजन सक्रिय है। अपना परिचालन निर्देश या प्रश्न बताएं।',
+    text: 'Greetings Rajesh. OQ operations engine is active. State your operational directive or inquiry.',
+    hindiText: 'नमस्ते राजेश। OQ संचालन इंजन सक्रिय है। अपना परिचालन निर्देश या प्रश्न बताएं।',
     timestamp: 'Active',
   },
 ];

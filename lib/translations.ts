@@ -2,7 +2,7 @@ import { Language } from './booking-types';
 
 export const DICTIONARY = {
   en: {
-    appName: 'Deslot',
+    appName: 'OQ',
     operatorTitle: 'Operator',
     ownerLabel: 'Rajesh Sharma',
     customerPortal: 'Customer Portal',
@@ -15,10 +15,10 @@ export const DICTIONARY = {
 
     // Onboarding Steps
     chooseLanguage: 'Choose Language',
-    chooseLanguageSub: 'Select your preferred language to experience the Deslot platform.',
+    chooseLanguageSub: 'Select your preferred language to experience the OQ platform.',
     continueBtn: 'Continue',
     selectRoleTitle: 'Select Operational Role',
-    selectRoleSub: 'Choose how you intend to use the Deslot platform.',
+    selectRoleSub: 'Choose how you intend to use the OQ platform.',
     verificationTitle: 'Identity Verification',
     verificationSubMobile: 'Provide your mobile number to receive a secure session passcode.',
     verificationSubPc: 'Provide your email address to receive a secure session passcode.',
@@ -29,7 +29,7 @@ export const DICTIONARY = {
     otpHint: 'Demo verification passcode: 123456',
     verifyBtn: 'Verify & Continue',
     profileSetupTitle: 'Business Profile Details',
-    profileSetupSub: 'Baseline structural metadata for your Deslot workspace.',
+    profileSetupSub: 'Baseline structural metadata for your OQ workspace.',
     entityTypeLabel: 'Business Structure',
     businessNameLabel: 'Enterprise Name',
     businessNamePlaceholder: 'e.g. Modern Cuts Grooming Studio',
@@ -55,9 +55,9 @@ export const DICTIONARY = {
     cancellationEmailTitle: 'Draft Client Cancellation Email',
     cancellationEmailSub: 'Compose the cancellation message that will be dispatched to all affected clients.',
     emailSubjectLabel: 'Subject Line',
-    emailSubjectDefault: 'Important: Cancellation of your upcoming appointment at Deslot',
+    emailSubjectDefault: 'Important: Cancellation of your upcoming appointment at OQ',
     emailBodyLabel: 'Message to Clients',
-    emailBodyDefault: 'Dear client,\n\nWe regret to inform you that our operations will be temporarily paused during your booked time slot due to unforeseen schedule adjustments. Your appointment has been cancelled and any fees will be refunded immediately.\n\nWarm regards,\nRajesh Sharma (Deslot)',
+    emailBodyDefault: 'Dear client,\n\nWe regret to inform you that our operations will be temporarily paused during your booked time slot due to unforeseen schedule adjustments. Your appointment has been cancelled and any fees will be refunded immediately.\n\nWarm regards,\nRajesh Sharma (OQ)',
     dispatchCancelBtn: 'Send Email Notice & Pause Operations',
     cancelAbortBtn: 'Return to Operations (Keep Bookings)',
 
@@ -95,7 +95,7 @@ export const DICTIONARY = {
 
     // New Venture Modal
     newVentureTitle: 'Configure New Venture',
-    newVentureSub: 'Launch another profession or enterprise branch under your Deslot account.',
+    newVentureSub: 'Launch another profession or enterprise branch under your OQ account.',
     ventureNameLabel: 'Enterprise Name',
     ventureSectorLabel: 'Trade / Sector',
     ventureLocationLabel: 'Location Address',
@@ -135,12 +135,12 @@ export const DICTIONARY = {
     bookingSuccess: 'Reservation Confirmed',
 
     // AI Full-Page
-    aiChatTitle: 'Deslot AI Assistant',
+    aiChatTitle: 'OQ AI Assistant',
     typeMessagePlaceholder: 'Speak or type any command (e.g. "Add 3 haircut slots for tomorrow at Main Chair")...',
   },
 
   hi: {
-    appName: 'Deslot',
+    appName: 'OQ',
     operatorTitle: 'चालक',
     ownerLabel: 'राजेश शर्मा',
     customerPortal: 'ग्राहक द्वार',
@@ -153,10 +153,10 @@ export const DICTIONARY = {
 
     // Onboarding Steps
     chooseLanguage: 'भाषा चुनें',
-    chooseLanguageSub: 'Deslot प्लेटफॉर्म को अनुभव करने के लिए अपनी पसंदीदा भाषा चुनें।',
+    chooseLanguageSub: 'OQ प्लेटफॉर्म को अनुभव करने के लिए अपनी पसंदीदा भाषा चुनें।',
     continueBtn: 'आगे बढ़ें',
     selectRoleTitle: 'अपनी भूमिका चुनें',
-    selectRoleSub: 'निर्धारित करें कि आप Deslot प्लेटफॉर्म का उपयोग कैसे करना चाहते हैं।',
+    selectRoleSub: 'निर्धारित करें कि आप OQ प्लेटफॉर्म का उपयोग कैसे करना चाहते हैं।',
     verificationTitle: 'पहचान सत्यापन',
     verificationSubMobile: 'सत्र पासकोड प्राप्त करने के लिए अपना मोबाइल नंबर दर्ज करें।',
     verificationSubPc: 'सत्र पासकोड प्राप्त करने के लिए अपना ईमेल पता दर्ज करें।',
@@ -167,7 +167,7 @@ export const DICTIONARY = {
     otpHint: 'डेमो सत्यापन कोड: 123456',
     verifyBtn: 'सत्यापित करें और आगे बढ़ें',
     profileSetupTitle: 'व्यवसाय विवरण',
-    profileSetupSub: 'आपके Deslot कार्यस्थल के लिए बुनियादी संरचनात्मक विवरण।',
+    profileSetupSub: 'आपके OQ कार्यस्थल के लिए बुनियादी संरचनात्मक विवरण।',
     entityTypeLabel: 'व्यवसाय का प्रकार',
     businessNameLabel: 'उद्यम का नाम',
     businessNamePlaceholder: 'उदा. मॉडर्न कट्स ग्रूमिंग स्टूडियो',
@@ -193,9 +193,9 @@ export const DICTIONARY = {
     cancellationEmailTitle: 'रद्दीकरण ईमेल का प्रारूप',
     cancellationEmailSub: 'वह संदेश लिखें जो प्रभावित सभी ग्राहकों को ईमेल द्वारा भेजा जाएगा।',
     emailSubjectLabel: 'विषय',
-    emailSubjectDefault: 'महत्वपूर्ण सूचना: Deslot पर आपकी आगामी बुकिंग का रद्दीकरण',
+    emailSubjectDefault: 'महत्वपूर्ण सूचना: OQ पर आपकी आगामी बुकिंग का रद्दीकरण',
     emailBodyLabel: 'ग्राहकों के लिए संदेश',
-    emailBodyDefault: 'प्रिय ग्राहक,\n\nअपरिहार्य कारणों से हमारे संचालन में अस्थायी रुकावट के कारण आपकी बुक की गई अपॉइंटमेंट रद्द कर दी गई है। किसी भी अग्रिम भुगतान का तुरंत रिफंड कर दिया जाएगा।\n\nसस्नेह,\nराजेश शर्मा (Deslot)',
+    emailBodyDefault: 'प्रिय ग्राहक,\n\nअपरिहार्य कारणों से हमारे संचालन में अस्थायी रुकावट के कारण आपकी बुक की गई अपॉइंटमेंट रद्द कर दी गई है। किसी भी अग्रिम भुगतान का तुरंत रिफंड कर दिया जाएगा।\n\nसस्नेह,\nराजेश शर्मा (OQ)',
     dispatchCancelBtn: 'ईमेल सूचना भेजें एवं सेवा रोकें',
     cancelAbortBtn: 'वापस जाएं (बुकिंग्स जारी रखें)',
 
@@ -233,7 +233,7 @@ export const DICTIONARY = {
 
     // New Venture Modal
     newVentureTitle: 'नया रोज़गार जोड़ें',
-    newVentureSub: 'अपने Deslot खाते में नई शाखा या कार्य क्षेत्र शुरू करें।',
+    newVentureSub: 'अपने OQ खाते में नई शाखा या कार्य क्षेत्र शुरू करें।',
     ventureNameLabel: 'व्यवसाय का नाम',
     ventureSectorLabel: 'क्षेत्र / व्यवसाय',
     ventureLocationLabel: 'कार्य स्थल का पता',
@@ -273,7 +273,7 @@ export const DICTIONARY = {
     bookingSuccess: 'बुकिंग सफलतापूर्वक दर्ज की गई',
 
     // AI Full-Page
-    aiChatTitle: 'Deslot एआई सहायक',
+    aiChatTitle: 'OQ एआई सहायक',
     typeMessagePlaceholder: 'कोई आदेश बोलें या लिखें (उदा. "कल के लिए 3 नए हेयरकट स्लॉट बनाएं")...',
   },
 };

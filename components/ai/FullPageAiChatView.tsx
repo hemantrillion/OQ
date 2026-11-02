@@ -86,7 +86,7 @@ export const FullPageAiChatView: React.FC<Props> = ({
           </button>
           <div className="h-4 w-px bg-white/10" />
           <span className="text-base font-bold text-white tracking-tight">
-            Deslot AI
+            OQ AI
           </span>
         </div>
 

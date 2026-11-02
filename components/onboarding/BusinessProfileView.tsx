@@ -217,7 +217,7 @@ export const BusinessProfileView: React.FC<Props> = ({
 
       {/* Footer */}
       <footer className="text-center text-xs md:text-sm text-slate-500 max-w-4xl mx-auto w-full">
-        Deslot Platform • Real-time Operations & Booking Architecture
+        OQ Platform • Real-time Operations & Booking Architecture
       </footer>
     </div>
   );

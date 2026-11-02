@@ -227,7 +227,7 @@ export default function Home() {
     );
   }
 
-  // 4. ACTIVE WORKSPACE: OPERATOR DESK (Deslot)
+  // 4. ACTIVE WORKSPACE: OPERATOR DESK (OQ)
   const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
 
   return (

@@ -21,7 +21,7 @@ export const VerificationView: React.FC<Props> = ({
 }) => {
   const [authMethod, setAuthMethod] = useState<'PHONE' | 'EMAIL'>('PHONE');
   const [phone, setPhone] = useState('+91 98234 11223');
-  const [email, setEmail] = useState('rajesh@deslot.in');
+  const [email, setEmail] = useState('rajesh@oq.in');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('123456');
 
@@ -183,7 +183,7 @@ export const VerificationView: React.FC<Props> = ({
 
       {/* Footer */}
       <footer className="text-center text-xs md:text-sm text-slate-500 max-w-4xl mx-auto w-full">
-        Deslot Platform • Real-time Operations & Booking Architecture
+        OQ Platform • Real-time Operations & Booking Architecture
       </footer>
     </div>
   );
