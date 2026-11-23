@@ -477,10 +477,11 @@ YOU MUST RESPOND IN VALID JSON MATCHING THIS EXACT SCHEMA:
           // try next model
         }
       }
+    }
 
-      if (!extracted!) {
-        // Highly adaptive rule-based extractor
-        const merged: Partial<ExtractedSchemaParams> = { ...currentState };
+    if (!extracted!) {
+      // Highly adaptive rule-based extractor
+      const merged: Partial<ExtractedSchemaParams> = { ...currentState };
         const textLower = rawText.toLowerCase();
 
         // 1. Detect Business Type & Domain
@@ -636,25 +637,6 @@ YOU MUST RESPOND IN VALID JSON MATCHING THIS EXACT SCHEMA:
           conversational_reply_hi: replyHi,
         };
       }
-    } else {
-      extracted = {
-        business_name: currentState.business_name || 'Apex ENT Specialist Clinic & Blood Lab',
-        business_type: currentState.business_type || 'ent_clinic_and_lab',
-        stations_count: currentState.stations_count || 3,
-        stations: [
-          { name: 'ENT Consultation Chamber 1', type: 'CHAMBER' },
-          { name: 'ENT Consultation Chamber 2', type: 'CHAMBER' },
-          { name: 'Phlebotomy & Blood Draw Station', type: 'LAB_DESK' },
-        ],
-        open_time: currentState.open_time || '08:00',
-        close_time: currentState.close_time || '20:00',
-        buffer_minutes: 0,
-        is_complete: false,
-        missing_fields: [],
-        conversational_reply_en: 'Greetings. State your operational directive or inquiry for your ENT clinic and blood test center.',
-        conversational_reply_hi: 'नमस्ते। अपने ईएनटी क्लिनिक और ब्लड टेस्ट सेंटर के लिए अपने निर्देश साझा करें।',
-      };
-    }
 
     // Check if user switched business type (e.g. barber to restaurant) or gave a new business name
     const isNewType = Boolean(
