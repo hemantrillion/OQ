@@ -4,7 +4,7 @@ export const DICTIONARY = {
   en: {
     appName: 'OQ',
     operatorTitle: 'Operator',
-    ownerLabel: 'Rajesh Sharma',
+    ownerLabel: 'Operator',
     customerPortal: 'Customer Portal',
     switchToOwner: 'Operator Desk',
     logout: 'Log Out',
@@ -34,7 +34,7 @@ export const DICTIONARY = {
     businessNameLabel: 'Enterprise Name',
     businessNamePlaceholder: 'e.g. Modern Cuts Grooming Studio',
     ownerNameLabel: 'Operator Full Name',
-    ownerNamePlaceholder: 'e.g. Rajesh Sharma',
+    ownerNamePlaceholder: 'e.g. Alex Morgan',
     sectorLabel: 'Sector / Profession',
     sectorBarber: 'Barber, Salon & Grooming',
     sectorClinic: 'Medical Clinic & Doctor Practice',
@@ -57,15 +57,20 @@ export const DICTIONARY = {
     emailSubjectLabel: 'Subject Line',
     emailSubjectDefault: 'Important: Cancellation of your upcoming appointment at OQ',
     emailBodyLabel: 'Message to Clients',
-    emailBodyDefault: 'Dear client,\n\nWe regret to inform you that our operations will be temporarily paused during your booked time slot due to unforeseen schedule adjustments. Your appointment has been cancelled and any fees will be refunded immediately.\n\nWarm regards,\nRajesh Sharma (OQ)',
+    emailBodyDefault: 'Dear client,\n\nWe regret to inform you that our operations will be temporarily paused during your booked time slot due to unforeseen schedule adjustments. Your appointment has been cancelled and any fees will be refunded immediately.\n\nWarm regards,\nOperations Team (OQ)',
     dispatchCancelBtn: 'Send Email Notice & Pause Operations',
-    cancelAbortBtn: 'Return to Operations (Keep Bookings)',
+    cancelAbortBtn: 'Return',
 
     // Navigation Tabs
     navFrontpage: 'Frontpage',
     navAppointments: 'Reservations',
     navEarnings: 'Revenue',
+    navDiscover: 'Operator',
     navOperator: 'Operator',
+    navProfile: 'Profile',
+    navBusinessProfile: 'Profile',
+    portalMode: 'Portal Mode',
+    bookingPortal: 'Booking Portal',
 
     // Frontpage
     frontHeroTitle: 'Universal Booking Operations',
@@ -134,15 +139,22 @@ export const DICTIONARY = {
     selectService: 'Select Service',
     bookingSuccess: 'Reservation Confirmed',
 
+    // Customer Dashboard Navigation Tabs
+    navCustDiscover: 'Discover',
+    navCustBook: 'Book',
+    navCustReservations: 'Reservations',
+    navCustSpendings: 'Spendings',
+    navCustProfile: 'Profile',
+
     // AI Full-Page
     aiChatTitle: 'OQ AI Assistant',
-    typeMessagePlaceholder: 'Speak or type any command (e.g. "Add 3 haircut slots for tomorrow at Main Chair")...',
+    typeMessagePlaceholder: 'Type a message or command...',
   },
 
   hi: {
     appName: 'OQ',
     operatorTitle: 'चालक',
-    ownerLabel: 'राजेश शर्मा',
+    ownerLabel: 'संचालक',
     customerPortal: 'ग्राहक द्वार',
     switchToOwner: 'संचालक डेस्क',
     logout: 'बाहर निकलें',
@@ -172,7 +184,7 @@ export const DICTIONARY = {
     businessNameLabel: 'उद्यम का नाम',
     businessNamePlaceholder: 'उदा. मॉडर्न कट्स ग्रूमिंग स्टूडियो',
     ownerNameLabel: 'संचालक का पूरा नाम',
-    ownerNamePlaceholder: 'उदा. राजेश शर्मा',
+    ownerNamePlaceholder: 'उदा. संचालक',
     sectorLabel: 'कार्य क्षेत्र / उद्योग',
     sectorBarber: 'नाई, सैलून एवं ग्रूमिंग',
     sectorClinic: 'चिकित्सालय एवं डॉक्टर क्लिनिक',
@@ -195,15 +207,20 @@ export const DICTIONARY = {
     emailSubjectLabel: 'विषय',
     emailSubjectDefault: 'महत्वपूर्ण सूचना: OQ पर आपकी आगामी बुकिंग का रद्दीकरण',
     emailBodyLabel: 'ग्राहकों के लिए संदेश',
-    emailBodyDefault: 'प्रिय ग्राहक,\n\nअपरिहार्य कारणों से हमारे संचालन में अस्थायी रुकावट के कारण आपकी बुक की गई अपॉइंटमेंट रद्द कर दी गई है। किसी भी अग्रिम भुगतान का तुरंत रिफंड कर दिया जाएगा।\n\nसस्नेह,\nराजेश शर्मा (OQ)',
+    emailBodyDefault: 'प्रिय ग्राहक,\n\nअपरिहार्य कारणों से हमारे संचालन में अस्थायी रुकावट के कारण आपकी बुक की गई अपॉइंटमेंट रद्द कर दी गई है। किसी भी अग्रिम भुगतान का तुरंत रिफंड कर दिया जाएगा।\n\nसस्नेह,\nसंचालन दल (OQ)',
     dispatchCancelBtn: 'ईमेल सूचना भेजें एवं सेवा रोकें',
-    cancelAbortBtn: 'वापस जाएं (बुकिंग्स जारी रखें)',
+    cancelAbortBtn: 'वापस',
 
     // Navigation Tabs
     navFrontpage: 'मुखपृष्ठ',
     navAppointments: 'बुकिंग सूची',
     navEarnings: 'आय विवरण',
-    navOperator: 'चालक',
+    navDiscover: 'ऑपरेटर',
+    navOperator: 'ऑपरेटर',
+    navProfile: 'प्रोफ़ाइल',
+    navBusinessProfile: 'प्रोफ़ाइल',
+    portalMode: 'पोर्टल मोड',
+    bookingPortal: 'बुकिंग पोर्टल',
 
     // Frontpage
     frontHeroTitle: 'बुकिंग एवं संसाधन प्रबंधन',
@@ -272,9 +289,16 @@ export const DICTIONARY = {
     selectService: 'सेवा चुनें',
     bookingSuccess: 'बुकिंग सफलतापूर्वक दर्ज की गई',
 
+    // Customer Dashboard Navigation Tabs
+    navCustDiscover: 'खोजें',
+    navCustBook: 'बुक करें',
+    navCustReservations: 'आरक्षण',
+    navCustSpendings: 'खर्च',
+    navCustProfile: 'प्रोफ़ाइल',
+
     // AI Full-Page
     aiChatTitle: 'OQ एआई सहायक',
-    typeMessagePlaceholder: 'कोई आदेश बोलें या लिखें (उदा. "कल के लिए 3 नए हेयरकट स्लॉट बनाएं")...',
+    typeMessagePlaceholder: 'संदेश या निर्देश लिखें...',
   },
 };
 
@@ -286,7 +310,6 @@ export function t(lang: Language, key: keyof typeof DICTIONARY['en']): string {
 export function localizeText(text: string, lang: Language): string {
   if (lang === 'en') return text;
   const translationMap: Record<string, string> = {
-    'Rajesh Sharma': 'राजेश शर्मा',
     'Modern Cuts Grooming Studio': 'मॉडर्न कट्स ग्रूमिंग स्टूडियो',
     'Main Studio (Downtown Chair 1 & 2)': 'मुख्य स्टूडियो (कुर्सी 1 और 2)',
     'East Wing Studio (Chair 3)': 'ईस्ट विंग स्टूडियो (कुर्सी 3)',

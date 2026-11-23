@@ -225,7 +225,7 @@ export const InvoicesBillingView: React.FC<InvoicesBillingViewProps> = ({
             {/* Receipt Header */}
             <div className="text-center pb-4 border-b border-dashed border-slate-300">
               <div className="text-slate-900 font-bold text-base tracking-wider uppercase font-mono">
-                RESTAURANT OBSERVATORY
+                BOOKING OQ OBSERVATORY
               </div>
               <p className="text-[11px] text-slate-500 mt-0.5">
                 FINE DINING & HOSPITALITY SUITE

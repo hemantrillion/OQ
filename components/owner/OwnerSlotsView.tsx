@@ -78,9 +78,6 @@ export const OwnerSlotsView: React.FC<Props> = ({
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
             {t(language, 'slotsPageTitle')}
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            {t(language, 'slotsPageSub')}
-          </p>
         </div>
 
         <button

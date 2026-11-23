@@ -4,7 +4,7 @@ import React from 'react';
 import { Language } from '@/lib/booking-types';
 import { t } from '@/lib/translations';
 
-export type OwnerTab = 'FRONTPAGE' | 'APPOINTMENTS' | 'EARNINGS' | 'OPERATOR';
+export type OwnerTab = 'FRONTPAGE' | 'APPOINTMENTS' | 'EARNINGS' | 'OPERATOR' | 'PROFILE';
 
 interface Props {
   language: Language;
@@ -30,6 +30,7 @@ export const OwnerNavRibbon: React.FC<Props> = ({
     },
     { id: 'EARNINGS', label: t(language, 'navEarnings') },
     { id: 'OPERATOR', label: t(language, 'navOperator') },
+    { id: 'PROFILE', label: t(language, 'navProfile') },
   ];
 
   return (
@@ -41,7 +42,7 @@ export const OwnerNavRibbon: React.FC<Props> = ({
           <button
             key={tab.id}
             onClick={() => onSelectTab(tab.id)}
-            className={`min-w-[140px] py-3 text-sm font-bold tracking-wide whitespace-nowrap transition-all flex items-center justify-center gap-2 rounded-full ${
+            className={`min-w-[140px] py-3 text-sm font-bold tracking-wide whitespace-nowrap transition-all flex items-center justify-center gap-2 rounded-full cursor-pointer ${
               isActive
                 ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'

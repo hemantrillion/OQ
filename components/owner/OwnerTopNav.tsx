@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Language, BusinessProfile, Appointment } from '@/lib/booking-types';
 import { t } from '@/lib/translations';
 import { OfflineCancellationModal } from './OfflineCancellationModal';
+import { AccountFlyoutPanel } from '@/components/auth/AccountFlyoutPanel';
 
 interface Props {
   language: Language;
@@ -13,7 +14,7 @@ interface Props {
   onToggleOnline: (nextState: boolean) => void;
   onCancelBookingsAndGoOffline: (cancelledIds: string[], emailBody: string) => void;
   onToggleLanguage: () => void;
-  onSwitchToCustomer: () => void;
+  onSwitchToCustomer?: () => void;
   onLogout: () => void;
 }
 
@@ -25,22 +26,36 @@ export const OwnerTopNav: React.FC<Props> = ({
   onToggleOnline,
   onCancelBookingsAndGoOffline,
   onToggleLanguage,
-  onSwitchToCustomer,
   onLogout,
 }) => {
   const [offlineModalOpen, setOfflineModalOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
-  const activeCount = appointments.filter((a) => a.status === 'UPCOMING').length;
+  const initials = business.ownerName
+    ? business.ownerName
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((n) => n[0].toUpperCase())
+        .join('')
+    : 'OQ';
+
+  const safeAvatarUrl = business.avatarUrl?.startsWith('/avatars/')
+    ? `/oq${business.avatarUrl}`
+    : business.avatarUrl;
 
   const handleStatusClick = () => {
     if (isOnline) {
-      if (activeCount > 0) {
-        // Active bookings exist: Initiate range & cancellation workflow!
-        setOfflineModalOpen(true);
-      } else {
+      const upcomingCount = appointments.filter((a) => a.status === 'UPCOMING').length;
+      if (upcomingCount === 0) {
+        // No active reservations, go offline directly without cancellation dialog
         onToggleOnline(false);
+      } else {
+        // Active reservations exist, open offline modal
+        setOfflineModalOpen(true);
       }
     } else {
+      // Turn back online immediately
       onToggleOnline(true);
     }
   };
@@ -54,48 +69,91 @@ export const OwnerTopNav: React.FC<Props> = ({
             {t(language, 'appName')}
           </div>
           <div className="text-sm text-slate-400 font-medium tracking-wide">
-            {business.ownerName}
+            {business.ownerName || 'Operator'}
           </div>
         </div>
 
         {/* Right Controls with Fixed Dimensions (Zero Jumps on Language Change) */}
         <div className="flex items-center gap-4">
-          {/* Online / Offline Status Button (Fixed Width 160px) */}
+          {/* Sliding Toggle Button: Online (ON) / Offline (OFF) */}
           <button
+            type="button"
             onClick={handleStatusClick}
-            className={`w-40 py-2.5 rounded-full text-xs font-bold tracking-wide transition-all border text-center ${
+            className={`h-11 px-3.5 rounded-full text-xs font-bold tracking-wide transition-all border flex items-center gap-3 cursor-pointer select-none ${
               isOnline
-                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25'
-                : 'bg-rose-500/15 text-rose-300 border-rose-500/30 hover:bg-rose-500/25'
+                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
+            title={isOnline ? (language === 'hi' ? 'ऑफलाइन' : 'Offline') : (language === 'hi' ? 'ऑनलाइन' : 'Online')}
           >
-            {isOnline ? t(language, 'statusOnline') : t(language, 'statusOffline')}
+            {/* Sliding Track & Thumb */}
+            <div
+              className={`w-11 h-6 rounded-full transition-colors duration-200 relative flex items-center p-0.5 ${
+                isOnline ? 'bg-emerald-500' : 'bg-slate-700'
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 transform ${
+                  isOnline ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </div>
+            <span className="font-bold whitespace-nowrap min-w-[55px] text-left">
+              {isOnline ? (language === 'hi' ? 'ऑनलाइन' : 'Online') : (language === 'hi' ? 'ऑफलाइन' : 'Offline')}
+            </span>
           </button>
 
           {/* Minimalist Language Switcher: अ / A (Fixed Dimensions 48px x 48px) */}
           <button
             onClick={onToggleLanguage}
             title={language === 'en' ? 'हिंदी में बदलें' : 'Switch to English'}
-            className="w-12 h-12 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-base flex items-center justify-center transition-all shrink-0"
+            className="w-12 h-12 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-base flex items-center justify-center transition-all shrink-0 cursor-pointer"
           >
             {language === 'en' ? 'अ' : 'A'}
           </button>
 
-          {/* Customer Portal (ग्राहक द्वार) (Fixed Width 160px) */}
-          <button
-            onClick={onSwitchToCustomer}
-            className="w-40 py-2.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold tracking-wide transition-all text-center hidden sm:inline-block"
-          >
-            {t(language, 'customerPortal')}
-          </button>
+          {/* Profile Circle Avatar Button (InfraTrace style with Flyout) */}
+          <div className="relative">
+            <button
+              type="button"
+              data-panel-trigger="account-flyout"
+              onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+              title={business.ownerName || 'Operator'}
+              aria-label="Account Menu"
+              className={`w-11 h-11 rounded-full p-0.5 transition-all cursor-pointer flex items-center justify-center shrink-0 ${
+                isAccountMenuOpen
+                  ? 'ring-2 ring-sky-400 scale-105 shadow-lg'
+                  : 'hover:ring-2 hover:ring-white/40 hover:scale-105'
+              }`}
+            >
+              <div className="w-full h-full rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md overflow-hidden border border-white/20">
+                {safeAvatarUrl ? (
+                  <img
+                    src={safeAvatarUrl}
+                    alt={business.ownerName || 'Operator'}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{initials}</span>
+                )}
+              </div>
+            </button>
 
-          {/* Log Out Button (Fixed Width 120px) */}
-          <button
-            onClick={onLogout}
-            className="w-32 py-2.5 rounded-full border border-rose-500/30 hover:bg-rose-500/15 text-rose-400 text-xs font-bold tracking-wide transition-all text-center"
-          >
-            {t(language, 'logout')}
-          </button>
+            {/* Account Flyout Panel (Containing Logout Option) */}
+            <AccountFlyoutPanel
+              isOpen={isAccountMenuOpen}
+              onClose={() => setIsAccountMenuOpen(false)}
+              name={business.ownerName || 'Operator'}
+              email={business.email || 'operator@bookingoq.com'}
+              avatarUrl={safeAvatarUrl}
+              language={language}
+              onLogout={onLogout}
+              onNavigateAccount={() => {
+                window.location.href = '/oq/account/';
+              }}
+            />
+          </div>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
 @echo off
-title TORI-YA FRONTEND (:3001)
-echo Launching Next.js Frontend Dashboard on http://localhost:3001...
+title BOOKING OQ FRONTEND (:3001)
+echo Launching Booking OQ Interface on http://localhost:3001/oq/...
 npm run dev

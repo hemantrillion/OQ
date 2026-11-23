@@ -46,7 +46,7 @@ func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collecti
 	}
 	dbName := os.Getenv("DATABASE_NAME")
 	if dbName == "" {
-		dbName = "restaurant"
+		dbName = "booking_oq"
 	}
 	return client.Database(dbName).Collection(collectionName)
 }

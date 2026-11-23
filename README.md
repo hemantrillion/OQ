@@ -1,6 +1,6 @@
-# TORI-YA 酉屋 — Enterprise Restaurant Management OS (Live Project Sem 7)
+# Booking OQ — Universal Operations & Queue Management Engine (Live Project Sem 7)
 
-A full-stack, enterprise-grade Restaurant Point of Sale (POS) and Management System built with **Golang**, **Gin Web Framework**, **MongoDB**, **JWT Authentication (HMAC-SHA256)**, and **Next.js 14 / Tailwind CSS**.
+A full-stack, enterprise-grade Operations, Queue & Dynamic Resource Management System built with **Next.js 14 / Tailwind CSS**, **Golang**, **Gin Web Framework**, **MongoDB**, **JWT Authentication (HMAC-SHA256)**, and **DBML Relational Schema Generation**.
 
 This project unifies and fixes the complete 18-part backend course by Akhil Sharma (implemented and debugged from Mohit Chandel's reference and Akhil Sharma's JWT project) into a single cohesive, production-ready system with a premium, high-density technical frontend interface.
 
@@ -121,7 +121,7 @@ npm run dev
 ## 🛠️ Repository Directory Structure
 
 ```
-c:\Desktop\Restaurant management system - Live Project sem 7\
+c:\Desktop\Booking OQ\
 ├── backend/                             # Standalone Golang Gin MongoDB Backend
 │   ├── controllers/                     # Clean, bug-free Gin controllers
 │   │   ├── foodController.go

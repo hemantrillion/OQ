@@ -13,18 +13,18 @@ interface Props {
   language: Language;
   onProfileCompleted: (profile: Partial<BusinessProfile>) => void;
   onBack: () => void;
-  onQuickEnterRajesh?: () => void;
+  onToggleLanguage?: () => void;
 }
 
 export const BusinessProfileView: React.FC<Props> = ({
   language,
   onProfileCompleted,
   onBack,
-  onQuickEnterRajesh,
+  onToggleLanguage,
 }) => {
   const [businessType, setBusinessType] = useState<BusinessType>('INDIVIDUAL');
   const [name, setName] = useState('Modern Cuts Grooming Studio');
-  const [ownerName, setOwnerName] = useState('Rajesh Sharma');
+  const [ownerName, setOwnerName] = useState('');
   const [sector, setSector] = useState<BusinessSector>('BARBER_SALON');
   const [primaryAddress, setPrimaryAddress] = useState(
     'Shop 14, Galaxy Arcade, MG Road, Pune'
@@ -72,12 +72,13 @@ export const BusinessProfileView: React.FC<Props> = ({
             {language === 'hi' ? 'पीछे' : 'Back'}
           </button>
 
-          {onQuickEnterRajesh && (
+          {onToggleLanguage && (
             <button
-              onClick={onQuickEnterRajesh}
-              className="px-4 py-2.5 rounded-full border border-sky-400/30 hover:border-sky-400 bg-sky-500/10 text-sky-300 text-xs md:text-sm font-bold transition-all hidden sm:inline-block"
+              onClick={onToggleLanguage}
+              className="w-10 h-10 md:w-11 md:h-11 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-sm md:text-base flex items-center justify-center transition-all shrink-0"
+              title={language === 'en' ? 'Switch to Hindi' : 'Switch to English'}
             >
-              {language === 'hi' ? 'राजेश डेस्क' : 'Rajesh Desk'}
+              {language === 'en' ? 'अ' : 'A'}
             </button>
           )}
         </div>

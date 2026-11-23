@@ -63,7 +63,7 @@ export const DatabaseSchemaExplorer: React.FC<DatabaseSchemaExplorerProps> = ({
             </h2>
           </div>
           <p className="text-xs text-slate-500 mt-1 font-mono">
-            Engine: MongoDB 7.0+ • Driver: <code className="text-blue-700 font-bold">go.mongodb.org/mongo-driver</code> • Database: <code className="text-blue-700 font-bold">restaurant</code>
+            Engine: MongoDB 7.0+ • Driver: <code className="text-blue-700 font-bold">go.mongodb.org/mongo-driver</code> • Database: <code className="text-blue-700 font-bold">booking_oq</code>
           </p>
         </div>
 

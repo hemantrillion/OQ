@@ -17,6 +17,13 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
     (tx) => filterMethod === 'ALL' || tx.method === filterMethod
   );
 
+  const totalToday = transactions
+    .filter((tx) => tx.date === 'Today')
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const totalWeek = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalMonth = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+
   const totalCash = transactions
     .filter((tx) => tx.method === 'CASH')
     .reduce((sum, tx) => sum + tx.amount, 0);
@@ -33,9 +40,6 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
             {t(language, 'earningsTitle')}
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Reconciled revenue metrics across cash and digital settlements
-          </p>
         </div>
 
         <div className="flex items-center gap-2 p-1 bg-white/5 rounded-full border border-white/10">
@@ -79,7 +83,7 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
             {t(language, 'totalToday')}
           </div>
           <div className="text-4xl font-extrabold text-white font-mono">
-            ₹1,250
+            ₹{totalToday.toLocaleString('en-IN')}
           </div>
           <div className="text-sm text-emerald-400 font-medium">
             Settled today
@@ -91,7 +95,7 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
             {t(language, 'totalWeek')}
           </div>
           <div className="text-4xl font-extrabold text-white font-mono">
-            ₹24,800
+            ₹{totalWeek.toLocaleString('en-IN')}
           </div>
           <div className="text-sm text-slate-400">
             Current operational cycle
@@ -103,7 +107,7 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
             {t(language, 'totalMonth')}
           </div>
           <div className="text-4xl font-extrabold text-white font-mono">
-            ₹89,500
+            ₹{totalMonth.toLocaleString('en-IN')}
           </div>
           <div className="text-sm text-slate-400">
             Cumulative monthly receipts
@@ -156,19 +160,27 @@ export const OwnerEarningsView: React.FC<Props> = ({ language }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-slate-300">
-              {filtered.map((tx) => (
-                <tr key={tx.id} className="hover:bg-white/5 transition-colors">
-                  <td className="py-4 px-4 font-bold text-white">{tx.customerName}</td>
-                  <td className="py-4 px-4 text-slate-300">{tx.serviceName}</td>
-                  <td className="py-4 px-4 font-mono font-bold text-white text-base">₹{tx.amount}</td>
-                  <td className="py-4 px-4">
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-slate-300">
-                      {tx.method === 'ONLINE_UPI' ? 'UPI' : 'Cash'}
-                    </span>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-500 font-medium">
+                    {language === 'hi' ? 'कोई लेन-देन दर्ज नहीं है।' : 'No transactions recorded yet.'}
                   </td>
-                  <td className="py-4 px-4 text-slate-400 text-xs">{tx.date}, {tx.time}</td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-white/5 transition-colors">
+                    <td className="py-4 px-4 font-bold text-white">{tx.customerName}</td>
+                    <td className="py-4 px-4 text-slate-300">{tx.serviceName}</td>
+                    <td className="py-4 px-4 font-mono font-bold text-white text-base">₹{tx.amount}</td>
+                    <td className="py-4 px-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-slate-300">
+                        {tx.method === 'ONLINE_UPI' ? 'UPI' : 'Cash'}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-slate-400 text-xs">{tx.date}, {tx.time}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -28,7 +28,7 @@ export const AuthJwtCenterView: React.FC<AuthJwtCenterViewProps> = ({
   onLogout,
 }) => {
   const [mode, setMode] = useState<'LOGIN' | 'SIGNUP'>('LOGIN');
-  const [email, setEmail] = useState('david.manager@restaurant.com');
+  const [email, setEmail] = useState('david.manager@bookingoq.com');
   const [password, setPassword] = useState('Admin@1234');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -225,7 +225,7 @@ export const AuthJwtCenterView: React.FC<AuthJwtCenterViewProps> = ({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="staff@restaurant.com"
+                  placeholder="staff@bookingoq.com"
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
                 />
               </div>
@@ -266,11 +266,11 @@ export const AuthJwtCenterView: React.FC<AuthJwtCenterViewProps> = ({
               Pre-configured Demo Credentials:
             </span>
             <div className="flex justify-between">
-              <span>Admin: <code className="text-blue-700 font-mono">david.manager@restaurant.com</code></span>
+              <span>Admin: <code className="text-blue-700 font-mono">david.manager@bookingoq.com</code></span>
               <span>Pass: <code className="text-slate-700 font-mono">Admin@1234</code></span>
             </div>
             <div className="flex justify-between">
-              <span>Server: <code className="text-blue-700 font-mono">sarah.server@restaurant.com</code></span>
+              <span>Server: <code className="text-blue-700 font-mono">sarah.server@bookingoq.com</code></span>
               <span>Pass: <code className="text-slate-700 font-mono">Server@1234</code></span>
             </div>
           </div>

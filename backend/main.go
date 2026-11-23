@@ -26,7 +26,7 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "operational",
-			"service": "Restaurant Management System API (Golang / Gin / MongoDB)",
+			"service": "Booking OQ API Engine (Golang / Gin / MongoDB)",
 			"version": "1.0.0",
 		})
 	})
@@ -57,7 +57,7 @@ func main() {
 
 	_ = publicRoutes
 
-	fmt.Printf("[Server] Restaurant Management System API running on port :%s\n", port)
+	fmt.Printf("[Server] Booking OQ API running on port :%s\n", port)
 	err := router.Run(":" + port)
 	if err != nil {
 		fmt.Printf("[Server Error] Failed to start server: %v\n", err)

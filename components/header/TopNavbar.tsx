@@ -61,12 +61,12 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
       {/* Left: Brand Logo & Title matching NEW PROJECT */}
       <div className="flex items-center gap-3 shrink-0">
         <div className="w-9 h-9 rounded-lg bg-[#0b57d0] text-white font-bold flex items-center justify-center text-sm shadow-xs font-mono">
-          RMS
+          OQ
         </div>
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-bold text-sm tracking-tight text-slate-900 font-sans uppercase">
-              RESTAURANT OBSERVATORY
+              BOOKING OQ OBSERVATORY
             </h1>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-mono font-medium">
               v1.0.0

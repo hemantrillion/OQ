@@ -30,7 +30,7 @@ var SECRET_KEY string = getSecretKey()
 func getSecretKey() string {
 	secret := os.Getenv("SECRET_KEY")
 	if secret == "" {
-		return "restaurant_jwt_secure_key_sem7_production"
+		return "booking_oq_jwt_secure_key_sem7_production"
 	}
 	return secret
 }

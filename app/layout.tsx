@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Restaurant Management Observatory | Live POS & Operations Engine',
-  description: 'Enterprise Restaurant POS & Management System built with Golang, Gin, MongoDB, JWT & Next.js',
+  title: 'OQ',
+  description: 'OQ',
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-[#f1f5f9] text-[#0f172a] flex flex-col antialiased">
+      <body className="min-h-screen bg-[#090d16] text-[#f1f5f9] flex flex-col antialiased">
         {children}
       </body>
     </html>

@@ -31,9 +31,6 @@ export const OwnerAppointmentsView: React.FC<Props> = ({
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
             {t(language, 'appointmentsTitle')}
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Confirmed client appointments and session logs
-          </p>
         </div>
 
         <div className="flex items-center gap-2 p-1 bg-white/5 rounded-full border border-white/10">

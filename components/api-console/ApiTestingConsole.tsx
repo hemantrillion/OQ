@@ -117,7 +117,7 @@ export const ApiTestingConsole: React.FC = () => {
           {
             error: err.message || 'Failed to reach Golang Gin API',
             targetUrl: `${API_BASE_URL}${selectedEndpoint.path}`,
-            note: 'Verify backend/restaurant-backend.exe is running on port :8080',
+            note: 'Verify backend/booking-oq-backend.exe is running on port :8080',
           },
           null,
           2

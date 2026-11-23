@@ -10,6 +10,7 @@ interface Props {
   business: BusinessProfile;
   onSwitchToCustomer: () => void;
   onRevisitOnboarding?: () => void;
+  onNavigateToBusinessProfile?: () => void;
 }
 
 export const OwnerProfileView: React.FC<Props> = ({
@@ -17,6 +18,7 @@ export const OwnerProfileView: React.FC<Props> = ({
   business,
   onSwitchToCustomer,
   onRevisitOnboarding,
+  onNavigateToBusinessProfile,
 }) => {
   return (
     <div className="flex-1 flex flex-col p-6 lg:p-12 gap-12 max-w-7xl mx-auto w-full select-none">
@@ -33,9 +35,18 @@ export const OwnerProfileView: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {onNavigateToBusinessProfile && (
+              <button
+                onClick={onNavigateToBusinessProfile}
+                className="px-5 py-2.5 rounded-full border border-sky-400/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-xs font-bold tracking-wide transition-all text-center"
+              >
+                {language === 'hi' ? 'व्यवसाय प्रोफ़ाइल' : 'Business Profile'}
+              </button>
+            )}
+
             <button
               onClick={onSwitchToCustomer}
-              className="w-40 py-2.5 rounded-full border border-sky-400/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 text-xs font-bold tracking-wide transition-all text-center"
+              className="w-40 py-2.5 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold tracking-wide transition-all text-center"
             >
               {t(language, 'customerPortal')}
             </button>

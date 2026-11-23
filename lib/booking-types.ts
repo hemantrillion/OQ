@@ -78,6 +78,7 @@ export interface BusinessProfile {
   ownerName: string;
   email: string;
   phone: string;
+  avatarUrl?: string;
   sector: BusinessSector;
   businessType: BusinessType;
   description: string;

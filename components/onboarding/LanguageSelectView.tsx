@@ -8,116 +8,92 @@ interface Props {
   currentLanguage: Language;
   onSelectLanguage: (lang: Language) => void;
   onProceed: () => void;
-  onQuickEnterRajesh?: () => void;
 }
 
 export const LanguageSelectView: React.FC<Props> = ({
   currentLanguage,
   onSelectLanguage,
   onProceed,
-  onQuickEnterRajesh,
 }) => {
   return (
-    <div className="min-h-screen flex flex-col justify-between p-6 lg:p-16 select-none bg-[#090d16] text-white">
-      {/* Top Header */}
-      <header className="flex items-center justify-between max-w-4xl mx-auto w-full">
-        <div>
-          <div className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-none">
+    <div className="min-h-screen flex flex-col justify-between p-6 select-none bg-[#090d16] text-white">
+      {/* Top Header - Fixed height flex container with enlarged language button */}
+      <header className="h-24 max-w-[520px] w-full mx-auto flex items-center justify-between shrink-0">
+        <div className="flex flex-col">
+          <span className="text-3xl font-extrabold tracking-tight text-white leading-tight">
             {t(currentLanguage, 'appName')}
-          </div>
-          <div className="text-sm md:text-base text-slate-400 font-medium tracking-wide mt-2">
-            {currentLanguage === 'hi' ? 'चरण 1 / 4 • भाषा चयन' : 'Step 1 of 4 • Language Selection'}
-          </div>
+          </span>
+          <span className="text-xs text-slate-400 font-medium tracking-wide mt-1">
+            {currentLanguage === 'hi' ? 'चरण 1 / 3 • भाषा चयन' : 'Step 1 of 3 • Language Selection'}
+          </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          {onQuickEnterRajesh && (
-            <button
-              onClick={onQuickEnterRajesh}
-              className="px-5 py-3 rounded-full border border-sky-400/30 hover:border-sky-400 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 text-xs md:text-sm font-bold transition-all text-center"
-            >
-              {currentLanguage === 'hi' ? 'राजेश शर्मा डेस्क पर जाएं' : 'Jump to Rajesh Workspace'}
-            </button>
-          )}
-
-          <button
-            onClick={() => onSelectLanguage(currentLanguage === 'en' ? 'hi' : 'en')}
-            className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-bold text-base md:text-lg flex items-center justify-center transition-all shrink-0"
-          >
-            {currentLanguage === 'en' ? 'अ' : 'A'}
-          </button>
-        </div>
+        {/* Enlarged, highly visible language switcher */}
+        <button
+          type="button"
+          onClick={() => onSelectLanguage(currentLanguage === 'en' ? 'hi' : 'en')}
+          className="w-14 h-14 rounded-full border border-white/15 hover:border-white/25 bg-white/5 hover:bg-white/10 text-white font-bold text-lg flex items-center justify-center transition-all shrink-0 cursor-pointer shadow-md"
+          title={currentLanguage === 'en' ? 'हिंदी में बदलें' : 'Switch to English'}
+        >
+          {currentLanguage === 'en' ? 'अ' : 'A'}
+        </button>
       </header>
 
-      {/* Main Choice Card */}
-      <main className="max-w-xl w-full mx-auto my-10">
-        <div className="display-canvas rounded-3xl p-8 lg:p-12 space-y-8 border border-white/10 shadow-2xl">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+      {/* Main Centered Flex Container */}
+      <main className="flex-1 flex items-center justify-center w-full py-4">
+        <div className="w-full max-w-[520px] h-[480px] display-canvas rounded-3xl p-8 border border-white/10 shadow-2xl flex flex-col justify-between">
+          {/* Card Header with Fixed Height */}
+          <div className="h-16 flex flex-col justify-center text-center shrink-0">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               {t(currentLanguage, 'chooseLanguage')}
             </h1>
-            <p className="text-sm md:text-base text-slate-400">
+            <p className="text-xs text-slate-400 mt-1">
               {t(currentLanguage, 'chooseLanguageSub')}
             </p>
           </div>
 
-          <div className="space-y-4 pt-2">
+          {/* Clean Language Options - Pure Language Names, No Descriptions, No Dots */}
+          <div className="flex flex-col gap-4 py-2 flex-1 justify-center">
             <button
               type="button"
               onClick={() => onSelectLanguage('en')}
-              className={`w-full p-6 rounded-2xl border text-left transition-all ${
+              className={`w-full h-16 px-6 rounded-2xl border flex items-center justify-center text-lg sm:text-xl font-bold transition-all cursor-pointer ${
                 currentLanguage === 'en'
-                  ? 'border-sky-400 bg-sky-500/15 shadow-lg'
-                  : 'border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10'
+                  ? 'border-sky-400 bg-sky-500/15 text-white shadow-lg'
+                  : 'border-white/10 hover:border-white/20 bg-white/5 text-slate-300 hover:text-white'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xl md:text-2xl font-bold text-white">English</span>
-                {currentLanguage === 'en' && (
-                  <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full bg-sky-500 text-slate-950">
-                    Selected
-                  </span>
-                )}
-              </div>
-              <div className="text-sm text-slate-400 mt-2">
-                Use refined, professional English across all OQ interfaces
-              </div>
+              English
             </button>
 
             <button
               type="button"
               onClick={() => onSelectLanguage('hi')}
-              className={`w-full p-6 rounded-2xl border text-left transition-all ${
+              className={`w-full h-16 px-6 rounded-2xl border flex items-center justify-center text-lg sm:text-xl font-bold transition-all cursor-pointer ${
                 currentLanguage === 'hi'
-                  ? 'border-sky-400 bg-sky-500/15 shadow-lg'
-                  : 'border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10'
+                  ? 'border-sky-400 bg-sky-500/15 text-white shadow-lg'
+                  : 'border-white/10 hover:border-white/20 bg-white/5 text-slate-300 hover:text-white'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xl md:text-2xl font-bold text-white">हिंदी (Hindi)</span>
-                {currentLanguage === 'hi' && (
-                  <span className="text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full bg-sky-500 text-slate-950">
-                    चयनित
-                  </span>
-                )}
-              </div>
-              <div className="text-sm text-slate-400 mt-2">
-                सम्पूर्ण सिस्टम को सरल, स्वाभाविक एवं शुद्ध हिंदी में उपयोग करें
-              </div>
+              हिंदी
             </button>
           </div>
 
-          <button
-            onClick={onProceed}
-            className="w-full py-4 rounded-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-base md:text-lg tracking-wide transition-all shadow-lg shadow-sky-500/20"
-          >
-            {t(currentLanguage, 'continueBtn')}
-          </button>
+          {/* Bottom Action Button */}
+          <div className="shrink-0 pt-2">
+            <button
+              type="button"
+              onClick={onProceed}
+              className="w-full h-14 rounded-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-base tracking-wide transition-all shadow-lg shadow-sky-500/20 flex items-center justify-center cursor-pointer"
+            >
+              {t(currentLanguage, 'continueBtn')}
+            </button>
+          </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center text-xs md:text-sm text-slate-500 max-w-4xl mx-auto w-full">
+      {/* Footer with Fixed Height */}
+      <footer className="h-12 max-w-[520px] w-full mx-auto flex items-center justify-center text-xs text-slate-500 shrink-0">
         OQ Platform • Real-time Operations & Booking Architecture
       </footer>
     </div>
