@@ -73,10 +73,34 @@ export const CustomerMapView: React.FC<Props> = ({
   const [modalWindow, setModalWindow] = useState('11:00 AM');
   const [modalConfirmed, setModalConfirmed] = useState(false);
 
-  // Customer Reservations & Spendings - Start clean and empty
+  // Customer Reservations & Spendings - Load live from SQLite
   const [reservations, setReservations] = useState<CustomerBooking[]>([]);
   const [spendings, setSpendings] = useState<CustomerSpending[]>([]);
   const [resFilter, setResFilter] = useState<'UPCOMING' | 'HISTORY'>('UPCOMING');
+
+  // Load real reservations from SQLite so bookings are synchronized across sessions
+  useEffect(() => {
+    fetch('/api/bookings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.bookings) && data.bookings.length > 0) {
+          const mapped: CustomerBooking[] = data.bookings.map((b: any) => ({
+            id: b.id,
+            businessId: b.business_id,
+            businessName: 'Apex ENT Specialist Clinic & Blood Lab',
+            serviceName: b.service_name,
+            price: 500,
+            date: b.booking_date,
+            time: b.start_time,
+            status: b.status === 'CONFIRMED' ? 'UPCOMING' : (b.status as any),
+            paymentMethod: 'ONLINE_UPI',
+            paymentStatus: 'PAID',
+          }));
+          setReservations(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Customer Profile local fields
   const [profileName, setProfileName] = useState(userName || '');
@@ -163,6 +187,22 @@ export const CustomerMapView: React.FC<Props> = ({
     };
 
     setReservations((prev) => [newRes, ...prev]);
+
+    // Commit booking directly to SQLite /api/bookings so it reflects on Owner/Operator desk immediately!
+    fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: bookName || userName || 'Customer',
+        customer_phone: bookPhone || '',
+        customer_email: userEmail || '',
+        service_name: bookService || 'ENT General Consultation',
+        booking_date: bookDate,
+        start_time: bookWindow,
+        price,
+      }),
+    }).catch((err) => console.error('Booking sync error:', err));
+
     if (bookPaymentMethod === 'ONLINE_UPI') {
       setSpendings((prev) => [
         {
@@ -186,6 +226,12 @@ export const CustomerMapView: React.FC<Props> = ({
   };
 
   const handleCancelReservation = (id: string) => {
+    fetch('/api/bookings/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: id }),
+    }).catch(() => {});
+
     setReservations((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status: 'CANCELLED' } : r))
     );
