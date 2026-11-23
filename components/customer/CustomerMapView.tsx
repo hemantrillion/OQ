@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '@/lib/booking-types';
 import { MAP_BUSINESSES, MapBusiness } from '@/lib/booking-data';
 import { t } from '@/lib/translations';

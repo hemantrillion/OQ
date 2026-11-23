@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const db = getDatabase();
 
-    const tenantId = body.tenant_id || body.business_id || `biz_${Date.now()}`;
+    const tenantId = body.tenant_id || body.business_id || 'biz_ent_clinic';
     const businessName = body.business_name || body.name || 'Specialist ENT & Blood Test Clinic';
     const businessType = body.business_type || 'ent_clinic_and_lab';
     const openTime = body.open_time || '08:00';

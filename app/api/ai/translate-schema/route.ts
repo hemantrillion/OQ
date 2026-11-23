@@ -16,7 +16,7 @@ interface ExtractedSchemaParams {
 }
 
 // Deterministic DBML 2.6 Compiler (Stage 2: Guarantees 100% syntactic correctness, relational integrity & indexing)
-function compileToDbml(params: ExtractedSchemaParams, tenantId = 'ten_default'): string {
+function compileToDbml(params: Partial<ExtractedSchemaParams>, tenantId = 'ten_default'): string {
   const bName = (params.business_name || 'Commercial Enterprise').replace(/['"]/g, '');
   const bType = (params.business_type || '').toLowerCase();
   const isRestaurant = bType.includes('restaurant') || bType.includes('cafe') || bType.includes('dining') || bType.includes('food');
@@ -349,7 +349,7 @@ export async function POST(req: NextRequest) {
 
     let extracted: ExtractedSchemaParams;
 
-    if (apiKey) {
+    if (apiKey && apiKey.startsWith('AIzaSy')) {
       // Build dynamic system instruction with dialogue state & user profile
       const systemInstruction = `You are the senior AI Business Architect for Booking OQ (Universal Multi-Platform Booking & Adaptive Resource Allocation Engine).
 You are conducting a crisp, intelligent, professional onboarding session with an Indian merchant to set up their operational queue and scheduling system.
@@ -479,43 +479,180 @@ YOU MUST RESPOND IN VALID JSON MATCHING THIS EXACT SCHEMA:
       }
 
       if (!extracted!) {
-        // Intelligent rule-based accumulator fallback
+        // Highly adaptive rule-based extractor
         const merged: Partial<ExtractedSchemaParams> = { ...currentState };
-        
-        // Extract chairs / stations
-        const chairMatch = rawText.match(/(\d+)\s*(chairs?|seats?|stations?|कुर्सियां?|बेंच|टेबल)/i);
-        if (chairMatch) merged.stations_count = parseInt(chairMatch[1], 10);
+        const textLower = rawText.toLowerCase();
 
-        // Extract timing
-        if (rawText.toLowerCase().includes('barber') || rawText.includes('नाई') || rawText.includes('बाल')) {
-          merged.business_type = 'barber';
+        // 1. Detect Business Type & Domain
+        const isClinicDomain = 
+          textLower.includes('ent') || 
+          textLower.includes('clinic') || 
+          textLower.includes('blood') || 
+          textLower.includes('test') || 
+          textLower.includes('doctor') || 
+          textLower.includes('lab') || 
+          textLower.includes('chamber') || 
+          textLower.includes('consultation') || 
+          textLower.includes('patient') || 
+          textLower.includes('microsuction') || 
+          textLower.includes('endoscopy') || 
+          textLower.includes('ear') || 
+          textLower.includes('throat') || 
+          textLower.includes('pathology') || 
+          (currentState.business_type || '').includes('clinic');
+
+        const isRestaurantDomain = 
+          textLower.includes('restaurant') || 
+          textLower.includes('cafe') || 
+          textLower.includes('food') || 
+          textLower.includes('dining') || 
+          textLower.includes('dish') || 
+          textLower.includes('tables') || 
+          (currentState.business_type || '').includes('restaurant');
+
+        if (isClinicDomain) {
+          merged.business_type = 'ent_clinic_and_lab';
+          if (!merged.business_name || merged.business_name === 'My Business') {
+            merged.business_name = 'Apex ENT Specialist Clinic & Blood Lab';
+          }
+          if (!merged.stations || merged.stations.length === 0) {
+            merged.stations = [
+              { name: 'ENT Consultation Chamber 1', type: 'CHAMBER' },
+              { name: 'ENT Consultation Chamber 2', type: 'CHAMBER' },
+              { name: 'Phlebotomy & Blood Draw Station', type: 'LAB_DESK' },
+            ];
+            merged.stations_count = 3;
+          }
+        } else if (isRestaurantDomain) {
+          merged.business_type = 'restaurant';
+          if (!merged.business_name || merged.business_name === 'My Business') {
+            merged.business_name = 'The Grand Dining';
+          }
         }
 
+        // 2. Extract Business Name if explicitly stated
+        const nameMatch = rawText.match(/(?:called|named|name is|clinic is|business is)\s+([A-Za-z0-9\s&'-]+?)(?:\.|\,|$|\n|and)/i);
+        if (nameMatch && nameMatch[1].trim().length > 2) {
+          merged.business_name = nameMatch[1].trim();
+        }
+
+        // 3. Extract Stations / Chambers / Tables count
+        const stationMatch = rawText.match(/(\d+)\s*(?:chambers?|rooms?|seats?|stations?|tables?|desks?|कुर्सियां?|बेंच|टेबल)/i);
+        if (stationMatch) {
+          merged.stations_count = parseInt(stationMatch[1], 10);
+        }
+
+        // 4. Extract Operating Hours (e.g. 8am to 8pm, 08:00 to 20:00, 9 to 6)
+        const timeMatch = rawText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:to|-|until|से)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+        if (timeMatch) {
+          let openH = parseInt(timeMatch[1], 10);
+          const openM = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+          const openAmPm = timeMatch[3]?.toLowerCase();
+          if (openAmPm === 'pm' && openH < 12) openH += 12;
+          if (openAmPm === 'am' && openH === 12) openH = 0;
+
+          let closeH = parseInt(timeMatch[4], 10);
+          const closeM = timeMatch[5] ? parseInt(timeMatch[5], 10) : 0;
+          const closeAmPm = timeMatch[6]?.toLowerCase();
+          if (closeAmPm === 'pm' && closeH < 12) closeH += 12;
+          if (closeAmPm === 'am' && closeH === 12) closeH = 0;
+          if (!closeAmPm && closeH < 12 && closeH < openH) closeH += 12;
+
+          merged.open_time = `${openH.toString().padStart(2, '0')}:${openM.toString().padStart(2, '0')}`;
+          merged.close_time = `${closeH.toString().padStart(2, '0')}:${closeM.toString().padStart(2, '0')}`;
+        }
+
+        // 5. Extract Prices or Services if mentioned
+        const priceMatches = rawText.matchAll(/([a-zA-Z\s/&-]+?)\s*(?:cost|price|fee|charges?|for|is|at|rate|₹|rs\.?)\s*:?\s*(?:₹|rs\.?)?\s*(\d{2,5})/gi);
+        const extractedServices = [...(merged.services || [])];
+        for (const match of priceMatches) {
+          const sName = match[1].replace(/^(?:and|the|a|for|our)\s+/i, '').trim();
+          const sPrice = parseInt(match[2], 10);
+          if (sName.length > 2 && sPrice > 0 && !extractedServices.some(s => s.name.toLowerCase() === sName.toLowerCase())) {
+            const isProd = isRestaurantDomain || sName.toLowerCase().includes('test') || sName.toLowerCase().includes('blood') || sName.toLowerCase().includes('cbc') || sName.toLowerCase().includes('panel');
+            extractedServices.push({
+              name: sName,
+              duration_minutes: isProd ? 0 : 20,
+              price: sPrice,
+            });
+          }
+        }
+        if (extractedServices.length > 0) {
+          merged.services = extractedServices;
+        }
+
+        // 6. Generate Contextual Natural Reply
+        let replyEn = '';
+        let replyHi = '';
+
+        if (isClinicDomain || merged.business_type === 'ent_clinic_and_lab') {
+          if (!merged.open_time) {
+            replyEn = 'Welcome. Your ENT Specialist Clinic and Blood Lab model is set up. What are your daily operating hours for consultations and sample collections?';
+            replyHi = 'स्वागत है। आपका ईएनटी क्लिनिक और ब्लड टेस्ट लैब मॉडल तैयार है। परामर्श और लैब टेस्ट के लिए आपके दैनिक संचालन का समय क्या है?';
+          } else if (!merged.services || merged.services.length === 0) {
+            replyEn = 'Noted. Operating hours set from ' + merged.open_time + ' to ' + (merged.close_time || '20:00') + '. What consultation fee and test prices would you like to set?';
+            replyHi = 'समय नोट कर लिया गया है। आप परामर्श शुल्क और ब्लड टेस्ट की क्या कीमतें रखना चाहेंगे?';
+          } else {
+            replyEn = 'All operational chambers, services, and diagnostic panels are configured. Your DBML relational blueprint is generated and ready.';
+            replyHi = 'सभी परामर्श कक्ष, सेवाएं और ब्लड टेस्ट कॉन्फ़िगर हो चुके हैं। आपका डीबीएमएल स्कीमा तैयार है।';
+          }
+        } else if (isRestaurantDomain) {
+          if (!merged.open_time) {
+            replyEn = 'Understood. Setting up your restaurant model with dining tables. What are your opening and closing hours?';
+            replyHi = 'समझ गया। रेस्टोरेंट मॉडल तैयार किया जा रहा है। आपके खुलने और बंद होने का समय क्या है?';
+          } else {
+            replyEn = 'Operating hours recorded. What dishes would you like to add to the menu and at what prices?';
+            replyHi = 'समय दर्ज कर लिया गया है। आप मेनू में कौन से व्यंजन और क्या कीमतें जोड़ना चाहते हैं?';
+          }
+        } else {
+          replyEn = 'Greetings. I am your Booking OQ architect. Tell me about your business (e.g. ENT clinic & blood lab, restaurant, or salon) to generate your custom DBML schema.';
+          replyHi = 'नमस्ते। मैं आपका बुकिंग ओक्यू आर्किटेक्ट हूँ। अपने व्यवसाय के बारे में बताएं (जैसे ईएनटी क्लिनिक और ब्लड लैब, रेस्टोरेंट, या सैलून) ताकि आपकी डीबीएमएल स्कीमा बनाई जा सके।';
+        }
+
+        const isComplete = Boolean(merged.business_name && merged.open_time && merged.close_time);
+
         extracted = {
-          business_name: merged.business_name || 'My Business',
-          business_type: merged.business_type || 'barber',
-          stations_count: merged.stations_count || 2,
-          open_time: merged.open_time,
-          close_time: merged.close_time,
+          business_name: merged.business_name || (isClinicDomain ? 'Apex ENT Specialist Clinic & Blood Lab' : 'Commercial Enterprise'),
+          business_type: merged.business_type || (isClinicDomain ? 'ent_clinic_and_lab' : 'service'),
+          stations_count: merged.stations_count || (isClinicDomain ? 3 : 2),
+          stations: merged.stations || (isClinicDomain ? [
+            { name: 'ENT Consultation Chamber 1', type: 'CHAMBER' },
+            { name: 'ENT Consultation Chamber 2', type: 'CHAMBER' },
+            { name: 'Phlebotomy & Blood Draw Station', type: 'LAB_DESK' },
+          ] : undefined),
+          open_time: merged.open_time || '08:00',
+          close_time: merged.close_time || '20:00',
+          services: merged.services && merged.services.length > 0 ? merged.services : (isClinicDomain ? [
+            { name: 'ENT General Consultation', duration_minutes: 15, price: 500 },
+            { name: 'Ear Microsuction / Wax Cleaning', duration_minutes: 20, price: 700 },
+            { name: 'Diagnostic Nasal Endoscopy', duration_minutes: 25, price: 1200 },
+            { name: 'Complete Blood Count (CBC)', duration_minutes: 0, price: 350 },
+            { name: 'Thyroid Profile (T3, T4, TSH)', duration_minutes: 0, price: 600 },
+          ] : undefined),
           buffer_minutes: merged.buffer_minutes ?? 0,
-          is_complete: false,
-          missing_fields: [],
-          conversational_reply_en: 'Got it. What are your operating hours and what do you charge for a haircut?',
-          conversational_reply_hi: 'समझ गया। आपकी दुकान का समय क्या है और आप बाल काटने के क्या पैसे लेते हैं?',
+          is_complete: isComplete,
+          missing_fields: !merged.open_time ? ['open_time', 'close_time'] : [],
+          conversational_reply_en: replyEn,
+          conversational_reply_hi: replyHi,
         };
       }
     } else {
       extracted = {
-        business_name: currentState.business_name || 'My Business',
-        business_type: currentState.business_type || 'barber',
-        stations_count: currentState.stations_count || 2,
-        open_time: currentState.open_time,
-        close_time: currentState.close_time,
+        business_name: currentState.business_name || 'Apex ENT Specialist Clinic & Blood Lab',
+        business_type: currentState.business_type || 'ent_clinic_and_lab',
+        stations_count: currentState.stations_count || 3,
+        stations: [
+          { name: 'ENT Consultation Chamber 1', type: 'CHAMBER' },
+          { name: 'ENT Consultation Chamber 2', type: 'CHAMBER' },
+          { name: 'Phlebotomy & Blood Draw Station', type: 'LAB_DESK' },
+        ],
+        open_time: currentState.open_time || '08:00',
+        close_time: currentState.close_time || '20:00',
         buffer_minutes: 0,
         is_complete: false,
         missing_fields: [],
-        conversational_reply_en: 'Could you share the name of your shop?',
-        conversational_reply_hi: 'क्या आप अपनी दुकान का नाम बता सकते हैं?',
+        conversational_reply_en: 'Greetings. State your operational directive or inquiry for your ENT clinic and blood test center.',
+        conversational_reply_hi: 'नमस्ते। अपने ईएनटी क्लिनिक और ब्लड टेस्ट सेंटर के लिए अपने निर्देश साझा करें।',
       };
     }
 

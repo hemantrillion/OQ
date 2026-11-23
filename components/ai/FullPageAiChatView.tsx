@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Database, Send, Mic, MicOff, RefreshCw } from 'lucide-react';
+import { X, Database, Send, Mic, MicOff, RefreshCw, FileCode, Eye } from 'lucide-react';
 import { Language, ChatMessage } from '@/lib/booking-types';
 import { INITIAL_AI_CHAT_MESSAGES } from '@/lib/booking-data';
 import { t } from '@/lib/translations';
@@ -63,6 +63,7 @@ export const FullPageAiChatView: React.FC<Props> = ({
 
   const [isComplete, setIsComplete] = useState(false);
   const [isSchemaOpen, setIsSchemaOpen] = useState(true);
+  const [drawerTab, setDrawerTab] = useState<'visual' | 'dbml'>('dbml');
   const [isTranslating, setIsTranslating] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -273,21 +274,36 @@ export const FullPageAiChatView: React.FC<Props> = ({
             Clear All
           </button>
 
+          {/* Direct DBML Blueprint Opener Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setDrawerTab('dbml');
+              setIsSchemaOpen(true);
+            }}
+            className="px-3 py-1.5 rounded-lg border border-sky-400/50 bg-sky-500/15 hover:bg-sky-500/25 text-sky-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            title="Open DBML File and Relational Blueprint"
+          >
+            <FileCode className="w-3.5 h-3.5 text-sky-400" />
+            <span>Open DBML File</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
           {/* Live Schema Inspector Toggle Button */}
           <button
             type="button"
-            onClick={() => setIsSchemaOpen(!isSchemaOpen)}
+            onClick={() => {
+              setDrawerTab('visual');
+              setIsSchemaOpen(!isSchemaOpen);
+            }}
             className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 transition-all cursor-pointer ${
-              isSchemaOpen
+              isSchemaOpen && drawerTab === 'visual'
                 ? 'bg-sky-500/10 border-sky-400/40 text-sky-300'
                 : 'bg-white/5 border-white/10 text-slate-300 hover:text-white'
             }`}
           >
             <Database className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Schema Inspector</span>
-            {currentState.business_name && (
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            )}
+            <span className="hidden sm:inline">Schema</span>
           </button>
 
           <button
@@ -338,6 +354,27 @@ export const FullPageAiChatView: React.FC<Props> = ({
                         ? msg.hindiText
                         : msg.text}
                     </div>
+
+                    {!isUser && generatedDbml && (
+                      <div className="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 text-xs text-sky-300 font-mono">
+                          <FileCode className="w-3.5 h-3.5 text-sky-400" />
+                          <span>DBML Blueprint Active</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDrawerTab('dbml');
+                            setIsSchemaOpen(true);
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-400/30 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
+                        >
+                          <Eye className="w-3 h-3 text-sky-400" />
+                          <span>View DBML</span>
+                        </button>
+                      </div>
+                    )}
+
                     <div
                       className={`text-[10px] font-mono ${
                         isUser ? 'text-sky-200/70 text-right' : 'text-slate-500'
@@ -418,6 +455,8 @@ export const FullPageAiChatView: React.FC<Props> = ({
           state={currentState}
           dbml={generatedDbml}
           merchantName={merchantName}
+          activeTab={drawerTab}
+          onTabChange={setDrawerTab}
         />
       </div>
     </div>

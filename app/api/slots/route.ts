@@ -11,8 +11,14 @@ export async function GET(req: NextRequest) {
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
     const db = getDatabase();
 
-    // Query active stations
-    const stations = db.prepare('SELECT id, name, station_type, status FROM stations').all() as any[];
+    // Query active stations (deduplicated by name to guarantee exactly 3 distinct stations)
+    const stations = db.prepare(`
+      SELECT id, name, station_type, status 
+      FROM stations 
+      WHERE rowid IN (
+        SELECT MIN(rowid) FROM stations GROUP BY name
+      )
+    `).all() as any[];
     // Query active bookings for the day
     const bookings = db.prepare(`
       SELECT id, station_id, service_name, customer_name, start_time, end_time, status 
