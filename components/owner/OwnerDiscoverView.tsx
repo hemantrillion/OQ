@@ -1,250 +1,525 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from '@/lib/booking-types';
-import { OwnerBlueprintView } from './OwnerBlueprintView';
-import { Sparkles, TrendingUp, Zap, Clock, ShieldCheck, Check } from 'lucide-react';
+import {
+  Stethoscope,
+  TestTube2,
+  CheckCircle2,
+  Clock,
+  PhoneCall,
+  UserCheck,
+  RefreshCw,
+  Database,
+  Calendar,
+  Layers,
+  Sparkles,
+} from 'lucide-react';
 
 interface Props {
   language: Language;
 }
 
-interface RecommendationItem {
+interface Station {
   id: string;
-  category: string;
-  categoryHindi: string;
-  title: string;
-  titleHindi: string;
-  impact: string;
-  impactHindi: string;
-  description: string;
-  descriptionHindi: string;
-  actionText: string;
-  actionTextHindi: string;
-  applied?: boolean;
+  name: string;
+  station_type: string;
+  status: 'AVAILABLE' | 'IN_SERVICE' | 'OCCUPIED';
+  current_patient?: string;
+  service_name?: string;
+}
+
+interface CatalogItem {
+  id: string;
+  name: string;
+  item_type: string;
+  duration_minutes: number;
+  price: number;
+}
+
+interface BookingRow {
+  id: string;
+  customer_name: string;
+  service_name: string;
+  booking_date: string;
+  start_time: string;
+  status: string;
 }
 
 export const OwnerDiscoverView: React.FC<Props> = ({ language }) => {
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([
-    {
-      id: 'rec_1',
-      category: 'CAPACITY & SLOTS',
-      categoryHindi: 'क्षमता एवं समय स्लॉट',
-      title: 'Peak Rush Hour Buffer Strategy',
-      titleHindi: 'उच्च मांग समय बफर रणनीति',
-      impact: '+24% Throughput',
-      impactHindi: '+24% क्षमता सुधार',
-      description:
-        'Weekend evening slots (4:00 PM – 7:30 PM) exhibit 100% capacity utilization. Add a 10-minute turnaround buffer or activate auxiliary station Chair 3 to prevent queue overflow.',
-      descriptionHindi:
-        'सप्ताहांत शाम (4:00 PM – 7:30 PM) के स्लॉट 100% भर चुके हैं। कतार रोकने हेतु 10 मिनट का बफर समय जोड़ें या अतिरिक्त कुर्सी 3 चालू करें।',
-      actionText: 'Apply Capacity Strategy',
-      actionTextHindi: 'रणनीति लागू करें',
-    },
-    {
-      id: 'rec_2',
-      category: 'REVENUE OPTIMIZATION',
-      categoryHindi: 'आय वृद्धि विश्लेषण',
-      title: 'Promote Executive Grooming Combo',
-      titleHindi: 'प्रीमियम ग्रूमिंग पैकेज प्रचारित करें',
-      impact: '+₹450 Avg Order Value',
-      impactHindi: '+₹450 औसत टिकट',
-      description:
-        'Complete Executive Grooming packages generate 48% higher margin than single haircut bookings. Pin as the primary highlighted recommendation on Customer Portal.',
-      descriptionHindi:
-        'संपूर्ण ग्रूमिंग पैकेज एकल सेवाओं की तुलना में 48% अधिक मुनाफा देता है। इसे ग्राहक पोर्टल पर शीर्ष स्थान पर दिखाएं।',
-      actionText: 'Pin to Customer Portal',
-      actionTextHindi: 'पोर्टल पर पिन करें',
-    },
-    {
-      id: 'rec_3',
-      category: 'OFF-PEAK OCCUPANCY',
-      categoryHindi: 'खाली समय में ग्राहक वृद्धि',
-      title: 'Dynamic Morning Slot Incentives',
-      titleHindi: 'सुबह के समय स्लॉट हेतु विशेष दरें',
-      impact: 'Fill 35% Open Seats',
-      impactHindi: '35% खाली सीटें भरें',
-      description:
-        'Weekday mornings before 11:30 AM have available seating capacity. Implement automated 15% off-peak tariff to balance customer footfall evenly across day.',
-      descriptionHindi:
-        'सुबह 11:30 बजे से पहले के समय में सीटें खाली रहती हैं। कार्य दिवसों में समान ग्राहक प्रवाह हेतु 15% की छूट दर लागू करें।',
-      actionText: 'Activate Off-Peak Pricing',
-      actionTextHindi: 'छूट दर सक्रिय करें',
-    },
-    {
-      id: 'rec_4',
-      category: 'AUTOMATION & RETENTION',
-      categoryHindi: 'स्वचालन एवं ग्राहक संतुष्टि',
-      title: 'Instant Cancellation Waitlist Backfill',
-      titleHindi: 'रद्दीकरण पर तुरंत सीट आवंटन',
-      impact: '0% Waste on Cancellations',
-      impactHindi: 'शून्य सीट बर्बादी',
-      description:
-        'Whenever an appointment is paused or cancelled, automatically alert waitlisted repeat clients in the same geographic radius with 1-click booking links.',
-      descriptionHindi:
-        'जब भी कोई बुकिंग रद्द हो, उसी क्षेत्र के प्रतीक्षा सूची वाले ग्राहकों को एक-क्लिक बुकिंग लिंक के साथ स्वतः सूचना भेजें।',
-      actionText: 'Enable Auto-Backfill',
-      actionTextHindi: 'स्वचालित सूचना चालू करें',
-    },
+  const [activeSubView, setActiveSubView] = useState<'GRID_2D' | 'CATALOG_1D' | 'BOOKINGS_1D' | 'DBML_SCHEMA'>('GRID_2D');
+
+  const [stations, setStations] = useState<Station[]>([
+    { id: 'st_1', name: 'ENT Consultation Chamber 1', station_type: 'CHAMBER', status: 'AVAILABLE' },
+    { id: 'st_2', name: 'ENT Consultation Chamber 2', station_type: 'CHAMBER', status: 'AVAILABLE' },
+    { id: 'st_3', name: 'Phlebotomy & Blood Draw Station', station_type: 'LAB_DESK', status: 'AVAILABLE' },
   ]);
 
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'ACTIVE' | 'APPLIED'>('ALL');
+  const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([
+    { id: 'cat_1', name: 'ENT General Consultation', item_type: 'CLINICAL_SERVICE', duration_minutes: 15, price: 500 },
+    { id: 'cat_2', name: 'Ear Microsuction / Wax Cleaning', item_type: 'CLINICAL_SERVICE', duration_minutes: 20, price: 700 },
+    { id: 'cat_3', name: 'Diagnostic Nasal Endoscopy', item_type: 'CLINICAL_SERVICE', duration_minutes: 25, price: 1200 },
+    { id: 'cat_4', name: 'Hearing Test / Audiometry', item_type: 'CLINICAL_SERVICE', duration_minutes: 30, price: 800 },
+    { id: 'cat_5', name: 'Complete Blood Count (CBC)', item_type: 'DIAGNOSTIC_TEST', duration_minutes: 0, price: 350 },
+    { id: 'cat_6', name: 'Thyroid Profile (T3, T4, TSH)', item_type: 'DIAGNOSTIC_TEST', duration_minutes: 0, price: 600 },
+    { id: 'cat_7', name: 'HbA1c & Fasting Blood Sugar', item_type: 'DIAGNOSTIC_TEST', duration_minutes: 0, price: 450 },
+    { id: 'cat_8', name: 'Allergy Blood Panel', item_type: 'DIAGNOSTIC_TEST', duration_minutes: 0, price: 1500 },
+  ]);
 
-  const handleApplyRecommendation = (id: string) => {
-    setRecommendations((prev) =>
-      prev.map((rec) => (rec.id === id ? { ...rec, applied: !rec.applied } : rec))
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [dbmlCode, setDbmlCode] = useState<string>('');
+  const [businessName, setBusinessName] = useState<string>('Apex ENT Specialist Clinic & Blood Lab');
+  const [isLoading, setIsLoading] = useState(false);
+  const [callingStationId, setCallingStationId] = useState<string | null>(null);
+
+  // Load live data from SQLite & localStorage
+  const loadLiveData = async () => {
+    setIsLoading(true);
+    try {
+      // 1. Fetch live slots & stations from database
+      const slotRes = await fetch('/api/slots');
+      const slotData = await slotRes.json();
+      if (slotData.success && Array.isArray(slotData.stations) && slotData.stations.length > 0) {
+        setStations(
+          slotData.stations.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            station_type: s.station_type || 'CHAMBER',
+            status: s.status || 'AVAILABLE',
+          }))
+        );
+      }
+
+      // 2. Fetch live bookings from database
+      const bkRes = await fetch('/api/bookings');
+      const bkData = await bkRes.json();
+      if (bkData.success && Array.isArray(bkData.bookings)) {
+        setBookings(bkData.bookings);
+      }
+
+      // 3. Load latest state & DBML from localStorage if created during chat
+      if (typeof window !== 'undefined') {
+        const savedState = localStorage.getItem('oq_ai_current_state');
+        if (savedState) {
+          const parsed = JSON.parse(savedState);
+          if (parsed.business_name) setBusinessName(parsed.business_name);
+          if (Array.isArray(parsed.services) && parsed.services.length > 0) {
+            setCatalogItems(
+              parsed.services.map((svc: any, idx: number) => ({
+                id: `svc_${idx + 1}`,
+                name: svc.name,
+                item_type: svc.type || (svc.duration_minutes ? 'CLINICAL_SERVICE' : 'DIAGNOSTIC_TEST'),
+                duration_minutes: svc.duration_minutes || 0,
+                price: svc.price || 0,
+              }))
+            );
+          }
+          if (Array.isArray(parsed.stations) && parsed.stations.length > 0) {
+            setStations(
+              parsed.stations.map((st: any, idx: number) => ({
+                id: `st_${idx + 1}`,
+                name: st.name,
+                station_type: st.type || 'CHAMBER',
+                status: 'AVAILABLE',
+              }))
+            );
+          }
+        }
+
+        const savedDbml = localStorage.getItem('oq_ai_generated_dbml');
+        if (savedDbml) setDbmlCode(savedDbml);
+      }
+    } catch (err) {
+      console.error('Failed to refresh operator desk data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLiveData();
+  }, []);
+
+  // Station Action: Call Next Patient to Station
+  const handleCallNext = async (station: Station) => {
+    setCallingStationId(station.id);
+    try {
+      const res = await fetch('/api/queue/token/call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ station_id: station.name }),
+      });
+      const data = await res.json();
+
+      setStations((prev) =>
+        prev.map((s) =>
+          s.id === station.id
+            ? {
+                ...s,
+                status: 'IN_SERVICE',
+                current_patient: data.customer_name || 'Hemant Kumar',
+                service_name: 'ENT General Consultation',
+              }
+            : s
+        )
+      );
+    } catch (err) {
+      console.error('Call next error:', err);
+    } finally {
+      setCallingStationId(null);
+    }
+  };
+
+  // Station Action: Mark Service Complete & Clear Station
+  const handleMarkComplete = (stationId: string) => {
+    setStations((prev) =>
+      prev.map((s) =>
+        s.id === stationId
+          ? { ...s, status: 'AVAILABLE', current_patient: undefined, service_name: undefined }
+          : s
+      )
     );
   };
 
-  const filteredRecs = recommendations.filter((r) => {
-    if (activeFilter === 'ACTIVE') return !r.applied;
-    if (activeFilter === 'APPLIED') return !!r.applied;
-    return true;
-  });
-
   return (
-    <div className="flex-1 flex flex-col p-6 lg:p-12 gap-10 max-w-7xl mx-auto w-full select-none text-white">
-      {/* 1. DISCOVER TOP BANNER */}
+    <div className="flex-1 flex flex-col p-6 lg:p-10 gap-8 max-w-7xl mx-auto w-full select-none text-slate-100 font-sans">
+      {/* 1. Header Bar with Business Title & Subview Switcher */}
       <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
         <div className="space-y-1">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
-              {language === 'hi' ? 'ऑपरेटर' : 'Operator'}
-            </h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-sky-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-sm">
+              OQ
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">{businessName}</h1>
+              <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                Live Operator Desk &bull; SQLite Relational Engine Active
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Filter Pills for Recommendations */}
-        <div className="flex items-center gap-2 p-1 bg-white/5 rounded-full border border-white/10 shrink-0">
+        {/* View Switcher Tabs */}
+        <div className="flex items-center gap-1.5 p-1 bg-white/5 rounded-2xl border border-white/10 shrink-0">
           <button
-            onClick={() => setActiveFilter('ALL')}
-            className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
-              activeFilter === 'ALL'
-                ? 'bg-sky-500 text-slate-950 font-bold shadow-md'
+            onClick={() => setActiveSubView('GRID_2D')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeSubView === 'GRID_2D'
+                ? 'bg-sky-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            {language === 'hi' ? 'सभी सुझाव' : 'All Insights'}
+            2D Chambers Grid
           </button>
           <button
-            onClick={() => setActiveFilter('ACTIVE')}
-            className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
-              activeFilter === 'ACTIVE'
-                ? 'bg-sky-500 text-slate-950 font-bold shadow-md'
+            onClick={() => setActiveSubView('CATALOG_1D')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeSubView === 'CATALOG_1D'
+                ? 'bg-sky-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            {language === 'hi' ? 'सक्रिय' : 'Actionable'}
+            1D Offerings Table
           </button>
           <button
-            onClick={() => setActiveFilter('APPLIED')}
-            className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
-              activeFilter === 'APPLIED'
-                ? 'bg-sky-500 text-slate-950 font-bold shadow-md'
+            onClick={() => setActiveSubView('BOOKINGS_1D')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeSubView === 'BOOKINGS_1D'
+                ? 'bg-sky-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            {language === 'hi' ? 'लागू किए गए' : 'Implemented'}
+            Appointments Log
+          </button>
+          <button
+            onClick={() => setActiveSubView('DBML_SCHEMA')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeSubView === 'DBML_SCHEMA'
+                ? 'bg-sky-500 text-slate-950 shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            DBML Blueprint
+          </button>
+          <button
+            onClick={loadLiveData}
+            disabled={isLoading}
+            className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition"
+            title="Refresh Data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </section>
 
-      {/* 2. OPERATIONAL RECOMMENDATIONS SUITE */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-sky-400" />
-            <h2 className="text-lg font-bold text-white uppercase tracking-wider text-xs">
-              {language === 'hi' ? 'स्मार्ट व्यावसायिक सुझाव' : 'Operational Recommendations'}
+      {/* 2. SUBVIEW: 2D CHAMBERS & STATIONS GRID */}
+      {activeSubView === 'GRID_2D' && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Layers className="w-4 h-4 text-sky-400" />
+              Live Consultation Chambers &amp; Lab Draw Stations (2D Layout)
             </h2>
+            <span className="text-xs text-slate-400 font-mono">
+              {stations.filter((s) => s.status === 'AVAILABLE').length} of {stations.length} Available
+            </span>
           </div>
-          <span className="text-xs text-slate-400">
-            {recommendations.filter((r) => r.applied).length} / {recommendations.length}{' '}
-            {language === 'hi' ? 'लागू' : 'Implemented'}
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredRecs.map((rec) => (
-            <div
-              key={rec.id}
-              className={`display-card rounded-3xl p-6 lg:p-7 border flex flex-col justify-between gap-6 transition-all ${
-                rec.applied
-                  ? 'border-emerald-500/30 bg-emerald-500/5'
-                  : 'border-white/10 hover:border-sky-400/40 bg-white/5'
-              }`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 font-mono">
-                    {language === 'hi' ? rec.categoryHindi : rec.category}
-                  </span>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold font-mono ${
-                      rec.applied
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-white/10 text-slate-200 border border-white/10'
-                    }`}
-                  >
-                    {language === 'hi' ? rec.impactHindi : rec.impact}
-                  </span>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stations.map((station) => {
+              const isAvailable = station.status === 'AVAILABLE';
+              const isCalling = callingStationId === station.id;
 
-                <h3 className="text-xl font-bold text-white tracking-tight">
-                  {language === 'hi' ? rec.titleHindi : rec.title}
-                </h3>
-
-                <p className="text-sm text-slate-300 leading-relaxed">
-                  {language === 'hi' ? rec.descriptionHindi : rec.description}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <Clock className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{language === 'hi' ? 'वास्तविक समय डेटा से उत्पन्न' : 'Derived from live traffic'}</span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleApplyRecommendation(rec.id)}
-                  className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-md ${
-                    rec.applied
-                      ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
-                      : 'bg-sky-500 hover:bg-sky-400 text-slate-950'
+              return (
+                <div
+                  key={station.id}
+                  className={`rounded-2xl p-6 border flex flex-col justify-between gap-5 transition-all shadow-sm ${
+                    isAvailable
+                      ? 'border-emerald-500/30 bg-emerald-500/5'
+                      : 'border-sky-500/40 bg-sky-500/10'
                   }`}
                 >
-                  {rec.applied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                      <span>{language === 'hi' ? 'सक्रिय है' : 'Active & Applied'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-3.5 h-3.5 fill-current" />
-                      <span>{language === 'hi' ? rec.actionTextHindi : rec.actionText}</span>
-                    </>
-                  )}
-                </button>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md font-mono bg-white/10 text-slate-300">
+                        {station.station_type}
+                      </span>
+                      <span
+                        className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                          isAvailable
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                        }`}
+                      >
+                        {station.status}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      {station.station_type === 'LAB_DESK' ? (
+                        <TestTube2 className="w-5 h-5 text-purple-400 shrink-0" />
+                      ) : (
+                        <Stethoscope className="w-5 h-5 text-sky-400 shrink-0" />
+                      )}
+                      <span>{station.name}</span>
+                    </h3>
+
+                    {/* Active Patient Details */}
+                    {station.current_patient ? (
+                      <div className="bg-black/30 p-3 rounded-xl border border-white/10 space-y-1 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Current Patient:</span>
+                          <span className="font-bold text-white">{station.current_patient}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Procedure:</span>
+                          <span className="font-semibold text-sky-300">{station.service_name}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        Chamber is sterilized and ready for the next patient intake.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Station Action Buttons */}
+                  <div className="pt-2 border-t border-white/10 flex gap-2">
+                    {isAvailable ? (
+                      <button
+                        onClick={() => handleCallNext(station)}
+                        disabled={isCalling}
+                        className="flex-1 py-2.5 bg-sky-500 text-slate-950 rounded-xl text-xs font-bold hover:bg-sky-400 transition flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>{isCalling ? 'Calling...' : 'Call Next Patient'}</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleMarkComplete(station.id)}
+                        className="flex-1 py-2.5 bg-emerald-500 text-slate-950 rounded-xl text-xs font-bold hover:bg-emerald-400 transition flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>Mark Complete</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* 3. SUBVIEW: 1D CATALOG & OFFERINGS TABLE */}
+      {activeSubView === 'CATALOG_1D' && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Database className="w-4 h-4 text-sky-400" />
+              1D Services &amp; Diagnostic Blood Tests Catalog ({catalogItems.length} items)
+            </h2>
+          </div>
+
+          <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden shadow-sm">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-white/5 text-slate-400 uppercase text-[10px] font-mono tracking-wider border-b border-white/10">
+                <tr>
+                  <th className="py-3 px-4">Offering Name</th>
+                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">Duration</th>
+                  <th className="py-3 px-4">Price (₹)</th>
+                  <th className="py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-slate-200">
+                {catalogItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-white/5 transition">
+                    <td className="py-3 px-4 font-semibold text-white flex items-center gap-2">
+                      {item.item_type.includes('TEST') ? (
+                        <TestTube2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      ) : (
+                        <Stethoscope className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      )}
+                      <span>{item.name}</span>
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[11px] text-slate-400">
+                      {item.item_type.includes('TEST') ? 'DIAGNOSTIC_TEST' : 'CLINICAL_SERVICE'}
+                    </td>
+                    <td className="py-3 px-4 font-mono">
+                      {item.duration_minutes > 0 ? `${item.duration_minutes} mins` : '— (N/A)'}
+                    </td>
+                    <td className="py-3 px-4 font-bold text-sky-400 font-mono">₹{item.price}</td>
+                    <td className="py-3 px-4">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        ACTIVE
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* 4. SUBVIEW: LIVE APPOINTMENTS LOG (1D TABLE) */}
+      {activeSubView === 'BOOKINGS_1D' && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-sky-400" />
+              Real-Time SQLite Bookings Table ({bookings.length} reservations)
+            </h2>
+          </div>
+
+          <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden shadow-sm">
+            {bookings.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-400">
+                No patient bookings recorded yet. New bookings from the customer portal will appear here in real time.
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-white/5 text-slate-400 uppercase text-[10px] font-mono tracking-wider border-b border-white/10">
+                  <tr>
+                    <th className="py-3 px-4">Booking ID</th>
+                    <th className="py-3 px-4">Patient Name</th>
+                    <th className="py-3 px-4">Service / Test</th>
+                    <th className="py-3 px-4">Date &amp; Time</th>
+                    <th className="py-3 px-4">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-slate-200">
+                  {bookings.map((b) => (
+                    <tr key={b.id} className="hover:bg-white/5 transition">
+                      <td className="py-3 px-4 font-mono text-[11px] text-slate-400">{b.id}</td>
+                      <td className="py-3 px-4 font-semibold text-white">{b.customer_name}</td>
+                      <td className="py-3 px-4">{b.service_name}</td>
+                      <td className="py-3 px-4 font-mono">
+                        {b.booking_date} at {b.start_time}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            b.status === 'CONFIRMED'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                          }`}
+                        >
+                          {b.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+      )}
 
-      {/* 3. RELATIONAL ARCHITECTURE GRAPH SECTION */}
-      <section className="space-y-4 pt-4">
-        <div className="flex items-center gap-2 pb-1">
-          <ShieldCheck className="w-4 h-4 text-sky-400" />
-          <h2 className="text-lg font-bold text-white uppercase tracking-wider text-xs">
-            {language === 'hi' ? 'डेटाबेस संरचना एवं एंटिटी रिलेशनल ग्राफ' : 'Data Architecture & Relational Graph'}
-          </h2>
-        </div>
+      {/* 5. SUBVIEW: COMPILED DBML BLUEPRINT */}
+      {activeSubView === 'DBML_SCHEMA' && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-sky-400" />
+              Generated DBML 2.6 Relational Architecture
+            </h2>
+          </div>
 
-        <div className="display-canvas rounded-3xl p-6 lg:p-8 border border-white/10">
-          <OwnerBlueprintView language={language} />
-        </div>
-      </section>
+          <div className="bg-slate-950 p-6 rounded-2xl border border-white/10 font-mono text-xs text-sky-300 overflow-x-auto leading-relaxed shadow-inner">
+            <pre>{dbmlCode || `// Database Markup Language (DBML) v2.6 Blueprint
+// Auto-generated by Booking OQ AI Engine (ENT Clinic & Diagnostic Blood Lab Architecture)
+
+Project booking_oq {
+  database_type: 'PostgreSQL / SQLite'
+  Note: 'Specialist ENT Clinic Consultation & Diagnostic Pathology Lab Scheduling Engine'
+}
+
+Table businesses {
+  id uuid [pk]
+  name varchar(100) [not null]
+  business_type varchar(50) [default: 'ent_clinic_and_lab']
+  open_time time [not null, default: '08:00']
+  close_time time [not null, default: '20:00']
+  created_at timestamp [default: \`now()\`]
+}
+
+Table stations {
+  id uuid [pk]
+  business_id uuid [not null]
+  name varchar(50) [not null, note: 'Consultation Chamber 1, Chamber 2, or Blood Draw Station']
+  station_type varchar(50) [default: 'CHAMBER']
+  is_active boolean [default: true]
+}
+
+Table catalog_items {
+  id uuid [pk]
+  business_id uuid [not null]
+  name varchar(100) [not null]
+  item_type varchar(50) [not null, default: 'CLINICAL_SERVICE']
+  duration_minutes int [default: 15]
+  price decimal(10,2) [not null, default: 0.00]
+}
+
+Table bookings {
+  id uuid [pk]
+  business_id uuid [not null]
+  customer_name varchar(100) [not null]
+  service_name varchar(100) [not null]
+  booking_date date [not null]
+  start_time time [not null]
+  status varchar(20) [default: 'CONFIRMED']
+}
+
+Ref: stations.business_id > businesses.id [delete: cascade]
+Ref: catalog_items.business_id > businesses.id [delete: cascade]
+Ref: bookings.business_id > businesses.id [delete: cascade]`}</pre>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

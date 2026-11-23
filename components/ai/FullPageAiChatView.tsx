@@ -22,22 +22,75 @@ export const FullPageAiChatView: React.FC<Props> = ({
   onClose,
   onToggleLanguage,
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(() =>
-    INITIAL_AI_CHAT_MESSAGES.map((m) => ({
+  // Load saved chat history or fallback to clean initial state
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('oq_ai_chat_history');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return INITIAL_AI_CHAT_MESSAGES.map((m) => ({
       ...m,
       timestamp: m.timestamp === 'Just now' ? formatCurrentTime() : m.timestamp,
-    }))
-  );
+    }));
+  });
+
   const [inputText, setInputText] = useState('');
   const [isVoiceActive, setIsVoiceActive] = useState(false);
 
-  const [generatedDbml, setGeneratedDbml] = useState<string | null>(null);
-  const [currentState, setCurrentState] = useState<any>({});
+  const [generatedDbml, setGeneratedDbml] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem('oq_ai_generated_dbml');
+      } catch {}
+    }
+    return null;
+  });
+
+  const [currentState, setCurrentState] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('oq_ai_current_state');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return {};
+  });
+
   const [isComplete, setIsComplete] = useState(false);
   const [isSchemaOpen, setIsSchemaOpen] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Automatically persist chat history to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('oq_ai_chat_history', JSON.stringify(messages));
+    } catch {}
+  }, [messages]);
+
+  // Automatically persist extracted schema state to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('oq_ai_current_state', JSON.stringify(currentState));
+    } catch {}
+  }, [currentState]);
+
+  // Automatically persist DBML to localStorage
+  useEffect(() => {
+    try {
+      if (generatedDbml) {
+        localStorage.setItem('oq_ai_generated_dbml', generatedDbml);
+      } else {
+        localStorage.removeItem('oq_ai_generated_dbml');
+      }
+    } catch {}
+  }, [generatedDbml]);
 
   // Auto-scroll on new message
   useEffect(() => {
@@ -117,6 +170,19 @@ export const FullPageAiChatView: React.FC<Props> = ({
       } else {
         if (data.parameters) {
           setCurrentState(data.parameters);
+          // Automatically compile and apply DBML to SQLite so Operator desk sees live updated tables
+          fetch('/api/schema/migrate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              business_name: data.parameters.business_name,
+              business_type: data.parameters.business_type,
+              stations: data.parameters.stations,
+              services: data.parameters.services,
+              open_time: data.parameters.open_time,
+              close_time: data.parameters.close_time,
+            }),
+          }).catch(() => {});
         }
         if (data.is_complete !== undefined) {
           setIsComplete(Boolean(data.is_complete));
@@ -153,6 +219,11 @@ export const FullPageAiChatView: React.FC<Props> = ({
     setCurrentState({});
     setGeneratedDbml(null);
     setIsComplete(false);
+    try {
+      localStorage.removeItem('oq_ai_chat_history');
+      localStorage.removeItem('oq_ai_current_state');
+      localStorage.removeItem('oq_ai_generated_dbml');
+    } catch {}
     setMessages([
       {
         id: `ai_${Date.now()}`,
