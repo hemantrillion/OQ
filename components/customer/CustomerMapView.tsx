@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Language } from '@/lib/booking-types';
 import { MAP_BUSINESSES, MapBusiness } from '@/lib/booking-data';
 import { t } from '@/lib/translations';
@@ -73,33 +73,38 @@ export const CustomerMapView: React.FC<Props> = ({
   const [modalWindow, setModalWindow] = useState('11:00 AM');
   const [modalConfirmed, setModalConfirmed] = useState(false);
 
-  // Customer Reservations & Spendings - Load live from SQLite
+  // Customer Reservations & Spendings - Synced with SQLite database
   const [reservations, setReservations] = useState<CustomerBooking[]>([]);
   const [spendings, setSpendings] = useState<CustomerSpending[]>([]);
   const [resFilter, setResFilter] = useState<'UPCOMING' | 'HISTORY'>('UPCOMING');
 
-  // Load real reservations from SQLite so bookings are synchronized across sessions
+  // Load real reservations from SQLite
   useEffect(() => {
-    fetch('/api/bookings')
-      .then((res) => res.json())
-      .then((data) => {
+    async function loadLiveReservations() {
+      try {
+        const res = await fetch('/api/bookings');
+        const data = await res.json();
         if (data.success && Array.isArray(data.bookings) && data.bookings.length > 0) {
-          const mapped: CustomerBooking[] = data.bookings.map((b: any) => ({
-            id: b.id,
-            businessId: b.business_id,
-            businessName: 'Apex ENT Specialist Clinic & Blood Lab',
-            serviceName: b.service_name,
-            price: 500,
-            date: b.booking_date,
-            time: b.start_time,
-            status: b.status === 'CONFIRMED' ? 'UPCOMING' : (b.status as any),
-            paymentMethod: 'ONLINE_UPI',
-            paymentStatus: 'PAID',
-          }));
-          setReservations(mapped);
+          setReservations(
+            data.bookings.map((b: any) => ({
+              id: b.id,
+              businessId: b.business_id || 'biz_default',
+              businessName: 'Apex ENT Clinic & Blood Lab',
+              serviceName: b.service_name,
+              price: 500,
+              date: b.booking_date,
+              time: b.start_time,
+              status: b.status === 'CONFIRMED' ? 'UPCOMING' : (b.status as any),
+              paymentMethod: 'ONLINE_UPI',
+              paymentStatus: 'PAID',
+            }))
+          );
         }
-      })
-      .catch(() => {});
+      } catch (err) {
+        console.error('Failed to load live reservations:', err);
+      }
+    }
+    loadLiveReservations();
   }, []);
 
   // Customer Profile local fields
@@ -188,20 +193,19 @@ export const CustomerMapView: React.FC<Props> = ({
 
     setReservations((prev) => [newRes, ...prev]);
 
-    // Commit booking directly to SQLite /api/bookings so it reflects on Owner/Operator desk immediately!
+    // Commit to SQLite database so Owner & Operator desk see it in real time
     fetch('/api/bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        customer_name: bookName || userName || 'Customer',
-        customer_phone: bookPhone || '',
-        customer_email: userEmail || '',
+        customer_name: bookName || userName,
+        customer_phone: bookPhone,
+        customer_email: userEmail,
         service_name: bookService || 'ENT General Consultation',
         booking_date: bookDate,
-        start_time: bookWindow,
-        price,
+        start_time: bookWindow.replace(' AM', '').replace(' PM', ''),
       }),
-    }).catch((err) => console.error('Booking sync error:', err));
+    }).catch((err) => console.error('Booking sync failed:', err));
 
     if (bookPaymentMethod === 'ONLINE_UPI') {
       setSpendings((prev) => [
@@ -226,15 +230,15 @@ export const CustomerMapView: React.FC<Props> = ({
   };
 
   const handleCancelReservation = (id: string) => {
+    setReservations((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, status: 'CANCELLED' } : r))
+    );
+    // Sync cancellation to SQLite database
     fetch('/api/bookings/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ booking_id: id }),
-    }).catch(() => {});
-
-    setReservations((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: 'CANCELLED' } : r))
-    );
+    }).catch((err) => console.error('Cancellation sync failed:', err));
   };
 
   const tabs: Array<{ id: CustomerTab; label: string; badge?: number }> = [

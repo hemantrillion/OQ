@@ -53,42 +53,6 @@ export default function Home() {
   const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
   const [isOnline, setIsOnline] = useState<boolean>(true);
 
-  // Load live appointments from SQLite /api/bookings so customer bookings reflect on Owner & Operator desk in real time!
-  const loadLiveAppointments = async () => {
-    try {
-      const res = await fetch('/api/bookings');
-      const data = await res.json();
-      if (data.success && Array.isArray(data.bookings) && data.bookings.length > 0) {
-        const mapped: Appointment[] = data.bookings.map((b: any) => ({
-          id: b.id,
-          customerName: b.customer_name,
-          customerPhone: b.customer_phone || '',
-          customerEmail: b.customer_email || '',
-          serviceName: b.service_name,
-          price: 500,
-          slotId: b.id,
-          date: b.booking_date,
-          time: b.start_time,
-          locationId: 'loc_main',
-          locationName: 'Apex ENT Specialist Clinic & Blood Lab',
-          status: b.status === 'CONFIRMED' ? 'UPCOMING' : (b.status as any),
-          paymentStatus: 'PAID',
-          createdAt: b.created_at,
-        }));
-        setAppointments(mapped);
-      }
-    } catch (err) {
-      console.error('Failed to sync appointments from /api/bookings:', err);
-    }
-  };
-
-  // Poll /api/bookings every 4 seconds so reservations reflect across sessions without page refresh
-  useEffect(() => {
-    loadLiveAppointments();
-    const pollInterval = setInterval(loadLiveAppointments, 4000);
-    return () => clearInterval(pollInterval);
-  }, []);
-
   // Browser History & Native Back/Forward Navigation with Strict Auth Gatekeeping
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -192,6 +156,42 @@ export default function Home() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Synchronize real bookings from SQLite database every 4 seconds
+  useEffect(() => {
+    async function syncBookings() {
+      try {
+        const res = await fetch('/api/bookings');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.bookings) && data.bookings.length > 0) {
+          const mapped: Appointment[] = data.bookings.map((b: any) => ({
+            id: b.id,
+            customerName: b.customer_name || 'Patient',
+            customerPhone: b.customer_phone || '',
+            customerEmail: b.customer_email || '',
+            serviceName: b.service_name,
+            serviceHindiName: b.service_name,
+            price: 500,
+            slotId: b.station_id || 'st_1',
+            date: b.booking_date,
+            time: b.start_time,
+            locationId: 'loc_main',
+            locationName: 'Apex ENT & Blood Lab',
+            status: b.status === 'CONFIRMED' ? 'UPCOMING' : (b.status as any),
+            paymentStatus: 'PAID',
+            createdAt: b.created_at || new Date().toISOString(),
+          }));
+          setAppointments(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to sync live bookings:', err);
+      }
+    }
+
+    syncBookings();
+    const interval = setInterval(syncBookings, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const navigateToStep = (nextStep: OnboardingStep) => {
